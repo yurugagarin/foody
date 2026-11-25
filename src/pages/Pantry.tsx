@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useLibrary, useRecipes, copyText, useToast } from '../lib/hooks';
+import { useGoBack, useLibrary, useRecipes, copyText, useToast } from '../lib/hooks';
 import { matchPantry, countsForPantry } from '../lib/pantry';
 import { perPortion } from '../lib/nutrition';
 import { AI_PROMPT } from '../lib/importer';
@@ -15,6 +15,7 @@ export function Pantry() {
   const all = useRecipes();
   const [have, setHave] = useState<Set<string>>(() => new Set(JSON.parse(localStorage.getItem(KEY) ?? '[]')));
   const [toast, show] = useToast();
+  const goBack = useGoBack();
   const update = (s: Set<string>) => {
     setHave(s);
     localStorage.setItem(KEY, JSON.stringify([...s]));
@@ -37,7 +38,7 @@ export function Pantry() {
   return (
     <div className="page">
       <header className="between">
-        <Link to="/" className="icon-btn mobile-only" aria-label="Galeriye dön"><Icon name="back" /></Link>
+        <button className="icon-btn mobile-only" onClick={() => goBack('/')} aria-label="Geri"><Icon name="back" /></button>
         <span className="lab">{have.size} malzeme seçili</span>
         <button className="btn sm" onClick={() => update(new Set())}>Temizle</button>
       </header>

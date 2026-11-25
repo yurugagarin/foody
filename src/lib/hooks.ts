@@ -1,8 +1,25 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { db } from '../db';
 import type { Attempt, Ingredient, Recipe } from '../types';
 import { stats, type Stats } from './score';
+
+/**
+ * "Back" that always lands somewhere sensible: the previous screen inside the
+ * app, or `fallback` when the app was opened directly on this screen.
+ */
+export function useGoBack(): (fallback: string) => void {
+  const nav = useNavigate();
+  return useCallback(
+    (fallback: string) => {
+      const idx = (window.history.state as { idx?: number } | null)?.idx ?? 0;
+      if (idx > 0) nav(-1);
+      else nav(fallback, { replace: true });
+    },
+    [nav]
+  );
+}
 
 export function useLibrary(): Map<string, Ingredient> | undefined {
   return useLiveQuery(async () => new Map((await db.ingredients.toArray()).map((i) => [i.id, i])), []);

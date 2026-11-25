@@ -1,7 +1,7 @@
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
-import { useLibrary, useSessionState, plateKey, type PlateState } from '../lib/hooks';
+import { useGoBack, useLibrary, useSessionState, plateKey, type PlateState } from '../lib/hooks';
 import { f1, forGrams, kcal, parseNum, portionOf, recipeTotals, type Totals } from '../lib/nutrition';
 import { sortAttempts, stats } from '../lib/score';
 import { deleteRecipe, setBest } from '../lib/repo';
@@ -26,7 +26,7 @@ export function RecipeDetail() {
   const attempts = useLiveQuery(() => db.attempts.where('recipeId').equals(id).toArray(), [id]);
   const lib = useLibrary();
   const [plate, setPlate] = useSessionState<PlateState>(plateKey(id), { grams: {} });
-  const nav = useNavigate();
+  const goBack = useGoBack();
 
   if (recipe === null) {
     return <div className="page"><p className="muted">Tarif bulunamadı. <Link to="/">Galeriye dön</Link></p></div>;
@@ -51,7 +51,7 @@ export function RecipeDetail() {
           <div className="hero" style={{ marginInline: -16 }}>
             <PhotoView id={cover} empty="kapak fotoğrafı ekle" />
             <div className="top">
-              <button className="icon-btn" onClick={() => (history.length > 1 ? nav(-1) : nav('/'))} aria-label="Geri"><Icon name="back" /></button>
+              <button className="icon-btn" onClick={() => goBack('/')} aria-label="Geri"><Icon name="back" /></button>
               <div className="row">
                 <PhotoPicker
                   className="btn sm"
@@ -113,7 +113,7 @@ export function RecipeDetail() {
               onClick={async () => {
                 if (confirm(`“${recipe.ad}” ve bütün denemeleri silinsin mi?`)) {
                   await deleteRecipe(recipe.id);
-                  nav('/');
+                  goBack('/');
                 }
               }}
             >

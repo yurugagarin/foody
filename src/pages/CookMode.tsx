@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
-import { cookNoteKey, plateKey, useLibrary, useSessionState, type PlateState } from '../lib/hooks';
+import { cookNoteKey, plateKey, useGoBack, useLibrary, useSessionState, type PlateState } from '../lib/hooks';
 import { Icon } from '../components/Icon';
 
 function mmss(s: number): string {
@@ -22,6 +22,7 @@ export function CookMode() {
   const [showNote, setShowNote] = useState(false);
   const [showIngs, setShowIngs] = useState(false);
   const nav = useNavigate();
+  const goBack = useGoBack();
   const total = useRef(0);
 
   // Keep the screen on while cooking.
@@ -78,7 +79,7 @@ export function CookMode() {
   return (
     <div className="cook">
       <header className="between">
-        <Link to={`/tarif/${id}`} className="icon-btn" aria-label="Pişirme modundan çık"><Icon name="close" /></Link>
+        <button className="icon-btn" onClick={() => goBack(`/tarif/${id}`)} aria-label="Pişirme modundan çık"><Icon name="close" /></button>
         <span className="lab">Adım {i + 1} / {n}</span>
         <button className="btn sm" onClick={() => setShowIngs(!showIngs)}>Malzemeler</button>
       </header>
@@ -141,7 +142,7 @@ export function CookMode() {
       <div style={{ display: 'grid', gridTemplateColumns: '64px 1fr', gap: 10 }}>
         <button className="btn" style={{ height: 64, padding: 0 }} aria-label="Önceki adım" disabled={i === 0} onClick={() => setI(i - 1)}><Icon name="back" /></button>
         {last ? (
-          <button className="btn gold" style={{ height: 64, fontSize: 17 }} onClick={() => nav(`/tarif/${id}/puanla`)}>Bitti, puanla<Icon name="star" /></button>
+          <button className="btn gold" style={{ height: 64, fontSize: 17 }} onClick={() => nav(`/tarif/${id}/puanla`, { replace: true })}>Bitti, puanla<Icon name="star" /></button>
         ) : (
           <button className="btn gold" style={{ height: 64, fontSize: 17 }} onClick={() => setI(i + 1)}>Sonraki adım<Icon name="next" /></button>
         )}

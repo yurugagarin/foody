@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { db } from '../db';
-import { useLibrary, copyText, useToast } from '../lib/hooks';
+import { useGoBack, useLibrary, copyText, useToast } from '../lib/hooks';
 import { AI_PROMPT, parseImport, type DraftRecipe } from '../lib/importer';
 import { applyImport, resolveIngredients, saveRecipe, type Resolution, type ResolutionChoice } from '../lib/repo';
 import { add, forGrams, kcal, normName, parseNum, scale, ZERO, type Totals } from '../lib/nutrition';
@@ -60,6 +60,7 @@ export function Editor() {
   const lib = useLibrary();
   const [tab, setTab] = useState<'yapistir' | 'elle'>(id ? 'elle' : 'yapistir');
   const [form, setForm] = useState<Form | null>(id ? null : emptyForm());
+  const goBack = useGoBack();
 
   useEffect(() => {
     if (!id || !lib || form) return;
@@ -70,7 +71,7 @@ export function Editor() {
   return (
     <div className="page wide">
       <header className="between">
-        <Link to={id ? `/tarif/${id}` : '/'} className="icon-btn" aria-label="Vazgeç"><Icon name="close" /></Link>
+        <button className="icon-btn" onClick={() => goBack(id ? `/tarif/${id}` : '/')} aria-label="Vazgeç"><Icon name="close" /></button>
         <span className="lab">{id ? 'Tarifi düzenle' : 'Yeni tarif'}</span>
         <span style={{ width: 44 }} />
       </header>
@@ -125,7 +126,7 @@ function ImportPanel({ lib, toForm }: { lib: Map<string, Ingredient>; toForm: (f
       if (r.status === 'farkli') choices[r.key] = { values: pNum(vals[r.key]), updateLibrary: !!update[r.key] };
     }
     const ids = await applyImport(parsed.recipes, choices);
-    nav(ids.length === 1 ? `/tarif/${ids[0]}` : '/');
+    nav(ids.length === 1 ? `/tarif/${ids[0]}` : '/', { replace: true });
   };
 
   return (
@@ -210,6 +211,7 @@ function ImportPanel({ lib, toForm }: { lib: Map<string, Ingredient>; toForm: (f
 
 function FormPanel({ id, lib, form, setForm }: { id: string | null; lib: Map<string, Ingredient>; form: Form; setForm: (f: Form) => void }) {
   const nav = useNavigate();
+  const goBack = useGoBack();
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
   const byName = useMemo(() => new Map([...lib.values()].map((i) => [normName(i.ad), i])), [lib]);
@@ -251,7 +253,8 @@ function FormPanel({ id, lib, form, setForm }: { id: string | null; lib: Map<str
       malzemeler: rows.map((m) => ({ ad: m.ad.trim(), gram: n(m.gram) ?? 0, not: m.not.trim() || undefined, per100: pNum(m.p) })),
       adimlar: form.adimlar.map((x) => ({ metin: x.metin.trim(), sureDk: n(x.sureDk), derece: n(x.derece) }))
     });
-    nav(`/tarif/${rid}`);
+    if (id) goBack(`/tarif/${rid}`);
+    else nav(`/tarif/${rid}`, { replace: true });
   };
 
   return (

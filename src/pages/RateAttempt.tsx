@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
-import { cookNoteKey, plateKey, useLibrary, useSessionState, type PlateState } from '../lib/hooks';
+import { cookNoteKey, plateKey, useGoBack, useLibrary, useSessionState, type PlateState } from '../lib/hooks';
 import { portionOf, recipeTotals, parseNum } from '../lib/nutrition';
 import { stats } from '../lib/score';
 import { addAttempt } from '../lib/repo';
@@ -36,7 +36,7 @@ export function RateAttempt() {
   const [makeDefault, setMakeDefault] = useState(false);
   const [best, setBest] = useState(false);
   const [saving, setSaving] = useState(false);
-  const nav = useNavigate();
+  const goBack = useGoBack();
 
   if (!recipe || !attempts || !lib) return null;
   const st = stats(attempts);
@@ -76,13 +76,13 @@ export function RateAttempt() {
     );
     setCookNote('');
     if (makeDefault) setPlate({ grams: {} });
-    nav(`/tarif/${recipe.id}`);
+    goBack(`/tarif/${recipe.id}`);
   };
 
   return (
     <div className="page">
       <header className="between">
-        <Link to={`/tarif/${recipe.id}`} className="icon-btn" aria-label="Kapat"><Icon name="close" /></Link>
+        <button className="icon-btn" onClick={() => goBack(`/tarif/${recipe.id}`)} aria-label="Kapat"><Icon name="close" /></button>
         <span className="lab">{st.count + 1}. deneme</span>
         <span style={{ width: 44 }} />
       </header>
@@ -111,7 +111,7 @@ export function RateAttempt() {
       <section className="card stack">
         <span className="lab">Bu sefer 1 porsiyon · {parts} porsiyona böldün</span>
         <Badges t={t} size="md" />
-        <span className="small muted">{changes.length ? `Her zamankinden farkı: ${changes.join(', ')}` : 'Her zamanki gramlar.'} <Link to={`/tarif/${recipe.id}`}>Gramları değiştir</Link></span>
+        <span className="small muted">{changes.length ? `Her zamankinden farkı: ${changes.join(', ')}` : 'Her zamanki gramlar.'} <button onClick={() => goBack(`/tarif/${recipe.id}`)} style={{ background: 'none', border: 0, padding: 0, color: 'var(--gold)', textDecoration: 'underline', fontSize: 'inherit' }}>Gramları değiştir</button></span>
       </section>
 
       <section className="stack" style={{ gap: 10 }}>

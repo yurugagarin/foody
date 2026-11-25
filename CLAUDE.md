@@ -15,6 +15,8 @@ Uygulama açılışta `syncSeed()` (`src/lib/seed.ts`) ile cihaza henüz gelmemi
 
 ## Diğer
 
+- Gezinme: geri/kapat/kaydet tuşları `useGoBack()` (`src/lib/hooks.ts`) kullanır; alt ekrandan (düzenle, puanla, pişirme) dönüşte yeni sayfa açma (`nav(-1)` ya da `replace`). Gezinmeye dokunduysan `npm run build`, `npx vite preview --port 4173` ve `node scripts/geri-testi.cjs` çalıştır; hepsi OK olmalı.
+
 - Gramlar her zaman çiğ/kuru; "kuru/çiğ" etiketi kullanma.
 - Kullanıcı verisi (fotoğraflar, puanlar, gram düzenlemeleri) cihazda IndexedDB'de; repoda değil.
 - Logo `public/logo.svg`; değişince `npm run icons`.
