@@ -1,7 +1,7 @@
 import { Link, useParams } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
-import { useGoBack, useLibrary, useSessionState, plateKey, type PlateState } from '../lib/hooks';
+import { useGoBack, useLibrary, usePlate, type PlateState } from '../lib/hooks';
 import { f1, forGrams, kcal, parseNum, portionOf, recipeTotals, type Totals } from '../lib/nutrition';
 import { sortAttempts, stats } from '../lib/score';
 import { deleteRecipe, setBest } from '../lib/repo';
@@ -25,13 +25,13 @@ export function RecipeDetail() {
   const recipe = useLiveQuery(async () => (await db.recipes.get(id)) ?? null, [id]);
   const attempts = useLiveQuery(() => db.attempts.where('recipeId').equals(id).toArray(), [id]);
   const lib = useLibrary();
-  const [plate, setPlate] = useSessionState<PlateState>(plateKey(id), { grams: {} });
+  const [plate, setPlate] = usePlate(id);
   const goBack = useGoBack();
 
   if (recipe === null) {
     return <div className="page"><p className="muted">Tarif bulunamadı. <Link to="/">Galeriye dön</Link></p></div>;
   }
-  if (!recipe || !attempts || !lib) return null;
+  if (!recipe || !attempts || !lib || !plate) return null;
 
   const st = stats(attempts);
   const sorted = sortAttempts(attempts);
@@ -148,6 +148,12 @@ function FragmentStep({ n, metin, sure, derece }: { n: number; metin: string; su
   );
 }
 
+function savedAt(t: number): string {
+  const d = new Date(t);
+  const time = d.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+  return d.toDateString() === new Date().toDateString() ? time : `${d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' })} ${time}`;
+}
+
 interface PortionProps {
   recipe: Recipe;
   lib: Map<string, Ingredient>;
@@ -170,8 +176,19 @@ function Portion({ recipe, lib, plate, parts, setPlate, setGram, changed, diff, 
         <div className="stack" style={{ gap: 2 }}>
           <h2 className="h2">Porsiyonum</h2>
           <span className="small muted">bu sefer hangisinden kaç gram koydun?</span>
+          {plate.updatedAt && (changed || parts !== recipe.porsiyon || cooked) ? (
+            <span className="small" style={{ color: 'var(--k)' }}>Girdiklerin telefona kaydedildi · {savedAt(plate.updatedAt)}</span>
+          ) : null}
         </div>
-        <button className="btn sm" disabled={!changed && parts === recipe.porsiyon && !cooked} onClick={() => setPlate({ grams: {} })}>Her zamanki</button>
+        <button
+          className="btn sm"
+          disabled={!changed && parts === recipe.porsiyon && !cooked}
+          onClick={() => {
+            if (confirm('Bu sefer girdiğin gramlar silinsin ve her zamanki gramlara dönülsün mü?')) setPlate({ grams: {}, note: plate.note });
+          }}
+        >
+          Her zamanki
+        </button>
       </div>
       {recipe.malzemeler.map((m) => {
         const ing = lib.get(m.ingId);

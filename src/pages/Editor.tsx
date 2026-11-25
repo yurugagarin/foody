@@ -22,8 +22,11 @@ interface Form {
   malzemeler: IngRow[]; adimlar: StepRow[];
 }
 
-let seq = 0;
-const k = () => `r${++seq}`;
+const k = () => `r${Math.random().toString(36).slice(2, 10)}`;
+
+/** Unsaved editor work is kept on the device under these keys until saved or discarded. */
+const draftKey = (id?: string) => `editorDraft:${id ?? 'yeni'}`;
+const IMPORT_KEY = 'importDraft';
 const s = (n: number | null | undefined) => (n == null ? '' : String(n).replace('.', ','));
 const pStr = (p?: Per100): P100Str => (p ? { kcal: s(p.kcal), protein: s(p.protein), karb: s(p.karb), yag: s(p.yag) } : { ...EMPTY_P });
 const pNum = (p: P100Str): Per100 | undefined => {
@@ -59,13 +62,34 @@ export function Editor() {
   const { id } = useParams();
   const lib = useLibrary();
   const [tab, setTab] = useState<'yapistir' | 'elle'>(id ? 'elle' : 'yapistir');
-  const [form, setForm] = useState<Form | null>(id ? null : emptyForm());
+  const [form, setFormState] = useState<Form | null>(null);
+  const [restored, setRestored] = useState(false);
   const goBack = useGoBack();
 
+  const fresh = async (): Promise<Form | null> => {
+    if (!id) return emptyForm();
+    const r = await db.recipes.get(id);
+    return r && lib ? formFromRecipe(r, lib) : null;
+  };
+
   useEffect(() => {
-    if (!id || !lib || form) return;
-    void db.recipes.get(id).then((r) => r && setForm(formFromRecipe(r, lib)));
+    if (!lib || form) return;
+    void (async () => {
+      const d = (await db.meta.get(draftKey(id)))?.value as { form: Form } | undefined;
+      if (d?.form) {
+        setFormState(d.form);
+        setRestored(true);
+        setTab('elle');
+      } else setFormState(await fresh());
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, lib, form]);
+
+  /** Every change is written to the device right away. */
+  const setForm = (f: Form) => {
+    setFormState(f);
+    void db.meta.put({ key: draftKey(id), value: { form: f, at: Date.now() } });
+  };
 
   if (!lib || !form) return null;
   return (
@@ -81,6 +105,17 @@ export function Editor() {
           <button role="tab" aria-selected={tab === 'elle'} className={tab === 'elle' ? 'on' : ''} onClick={() => setTab('elle')}>Elle yaz</button>
         </div>
       )}
+      {restored && (
+        <div className="notice between wrap">
+          <span>Kaydetmediğin değişiklikler geri yüklendi.</span>
+          <button className="btn sm" onClick={async () => {
+            if (!confirm('Kaydetmediğin değişiklikler silinsin mi?')) return;
+            await db.meta.delete(draftKey(id));
+            setRestored(false);
+            setFormState(await fresh());
+          }}>{id ? 'Kayıtlı haline dön' : 'Taslağı sil'}</button>
+        </div>
+      )}
       {tab === 'yapistir' && !id ? (
         <ImportPanel lib={lib} toForm={(f) => { setForm(f); setTab('elle'); }} />
       ) : (
@@ -91,7 +126,14 @@ export function Editor() {
 }
 
 function ImportPanel({ lib, toForm }: { lib: Map<string, Ingredient>; toForm: (f: Form) => void }) {
-  const [text, setText] = useState('');
+  const [text, setTextState] = useState('');
+  useEffect(() => {
+    void db.meta.get(IMPORT_KEY).then((d) => d && setTextState(String(d.value)));
+  }, []);
+  const setText = (t: string) => {
+    setTextState(t);
+    void (t ? db.meta.put({ key: IMPORT_KEY, value: t }) : db.meta.delete(IMPORT_KEY));
+  };
   const [vals, setVals] = useState<Record<string, P100Str>>({});
   const [update, setUpdate] = useState<Record<string, boolean>>({});
   const [busy, setBusy] = useState(false);
@@ -126,6 +168,7 @@ function ImportPanel({ lib, toForm }: { lib: Map<string, Ingredient>; toForm: (f
       if (r.status === 'farkli') choices[r.key] = { values: pNum(vals[r.key]), updateLibrary: !!update[r.key] };
     }
     const ids = await applyImport(parsed.recipes, choices);
+    await db.meta.delete(IMPORT_KEY);
     nav(ids.length === 1 ? `/tarif/${ids[0]}` : '/', { replace: true });
   };
 
@@ -253,6 +296,7 @@ function FormPanel({ id, lib, form, setForm }: { id: string | null; lib: Map<str
       malzemeler: rows.map((m) => ({ ad: m.ad.trim(), gram: n(m.gram) ?? 0, not: m.not.trim() || undefined, per100: pNum(m.p) })),
       adimlar: form.adimlar.map((x) => ({ metin: x.metin.trim(), sureDk: n(x.sureDk), derece: n(x.derece) }))
     });
+    await db.meta.delete(draftKey(id ?? undefined));
     if (id) goBack(`/tarif/${rid}`);
     else nav(`/tarif/${rid}`, { replace: true });
   };

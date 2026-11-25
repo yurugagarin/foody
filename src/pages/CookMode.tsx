@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
-import { cookNoteKey, plateKey, useGoBack, useLibrary, useSessionState, type PlateState } from '../lib/hooks';
+import { useGoBack, useLibrary, usePlate } from '../lib/hooks';
 import { Icon } from '../components/Icon';
 
 function mmss(s: number): string {
@@ -14,8 +14,7 @@ export function CookMode() {
   const { id = '' } = useParams();
   const recipe = useLiveQuery(() => db.recipes.get(id), [id]);
   const lib = useLibrary();
-  const [plate] = useSessionState<PlateState>(plateKey(id), { grams: {} });
-  const [note, setNote] = useSessionState<string>(cookNoteKey(id), '');
+  const [plate, setPlate] = usePlate(id);
   const [i, setI] = useState(0);
   const [left, setLeft] = useState<number | null>(null);
   const [running, setRunning] = useState(false);
@@ -68,7 +67,7 @@ export function CookMode() {
     return () => clearInterval(t);
   }, [running]);
 
-  if (!recipe || !lib) return null;
+  if (!recipe || !lib || !plate) return null;
   const n = recipe.adimlar.length;
   if (!n) return <div className="cook"><p>Bu tarifte adım yok. <Link to={`/tarif/${id}/duzenle`}>Adım ekle</Link></p></div>;
   const last = i === n - 1;
@@ -127,7 +126,7 @@ export function CookMode() {
       {showNote && (
         <label className="field">
           <span className="sr">Pişirirken notun</span>
-          <textarea className="textarea" rows={3} value={note} onChange={(e) => setNote(e.target.value)} placeholder="Ne değiştirdin? Kaç derece, kaç dakika?" />
+          <textarea className="textarea" rows={3} value={plate.note ?? ''} onChange={(e) => setPlate({ ...plate, note: e.target.value })} placeholder="Ne değiştirdin? Kaç derece, kaç dakika?" />
           <span className="small muted">Bitince puanlama ekranına kendiliğinden gelir.</span>
         </label>
       )}

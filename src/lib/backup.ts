@@ -16,16 +16,17 @@ async function dataUrlToBlob(u: string): Promise<Blob> {
 
 /** One file with everything, photos included: for moving between phone and computer. */
 export async function exportAll(): Promise<Blob> {
-  const [ingredients, recipes, attempts, photos, seedKeys] = await Promise.all([
+  const [ingredients, recipes, attempts, photos, seedKeys, plates] = await Promise.all([
     db.ingredients.toArray(),
     db.recipes.toArray(),
     db.attempts.toArray(),
     db.photos.toArray(),
-    db.meta.get('seedKeys')
+    db.meta.get('seedKeys'),
+    db.plates.toArray()
   ]);
   const ph = [];
   for (const p of photos) ph.push({ id: p.id, createdAt: p.createdAt, blob: await blobToDataUrl(p.blob), thumb: await blobToDataUrl(p.thumb) });
-  const data = { app: 'foody', version: 1, exportedAt: new Date().toISOString(), ingredients, recipes, attempts, photos: ph, seedKeys: seedKeys?.value ?? [] };
+  const data = { app: 'foody', version: 1, exportedAt: new Date().toISOString(), ingredients, recipes, attempts, photos: ph, seedKeys: seedKeys?.value ?? [], plates };
   return new Blob([JSON.stringify(data)], { type: 'application/json' });
 }
 
@@ -35,12 +36,13 @@ export async function importAll(file: File): Promise<{ recipes: number }> {
   if (data?.app !== 'foody') throw new Error('Bu bir foody yedeği değil.');
   const photos: Photo[] = [];
   for (const p of data.photos ?? []) photos.push({ id: p.id, createdAt: p.createdAt, blob: await dataUrlToBlob(p.blob), thumb: await dataUrlToBlob(p.thumb) });
-  await db.transaction('rw', [db.ingredients, db.recipes, db.attempts, db.photos, db.meta], async () => {
-    await Promise.all([db.ingredients.clear(), db.recipes.clear(), db.attempts.clear(), db.photos.clear()]);
+  await db.transaction('rw', [db.ingredients, db.recipes, db.attempts, db.photos, db.meta, db.plates], async () => {
+    await Promise.all([db.ingredients.clear(), db.recipes.clear(), db.attempts.clear(), db.photos.clear(), db.plates.clear()]);
     await db.ingredients.bulkPut(data.ingredients ?? []);
     await db.recipes.bulkPut(data.recipes ?? []);
     await db.attempts.bulkPut(data.attempts ?? []);
     await db.photos.bulkPut(photos);
+    await db.plates.bulkPut(data.plates ?? []);
     await db.meta.put({ key: 'seedKeys', value: data.seedKeys ?? [] });
   });
   return { recipes: (data.recipes ?? []).length };

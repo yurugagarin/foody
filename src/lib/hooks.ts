@@ -2,7 +2,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../db';
-import type { Attempt, Ingredient, Recipe } from '../types';
+import type { Attempt, Ingredient, Plate, Recipe } from '../types';
 import { stats, type Stats } from './score';
 
 /**
@@ -43,22 +43,6 @@ export function useRecipes(): RecipeWithStats[] | undefined {
   }, []);
 }
 
-/** State kept for the browser session (survives going to cook mode and back). */
-export function useSessionState<T>(key: string, initial: T): [T, (v: T) => void] {
-  const [v, setV] = useState<T>(() => {
-    try {
-      const s = sessionStorage.getItem(key);
-      return s ? (JSON.parse(s) as T) : initial;
-    } catch {
-      return initial;
-    }
-  });
-  useEffect(() => {
-    sessionStorage.setItem(key, JSON.stringify(v));
-  }, [key, v]);
-  return [v, setV];
-}
-
 export function useToast(): [string | null, (msg: string) => void] {
   const [msg, setMsg] = useState<string | null>(null);
   useEffect(() => {
@@ -78,19 +62,38 @@ export async function copyText(text: string): Promise<boolean> {
   }
 }
 
+export type PlateState = Omit<Plate, 'recipeId' | 'updatedAt'> & { updatedAt?: number };
+
 /**
- * Per-recipe "Porsiyonum" state: the grams put in this time (whole recipe),
- * how many portions it was divided into, and optionally the cooked weight.
+ * Today's grams for a recipe, saved on the device on every change so nothing
+ * typed is lost when the app is closed. Null while loading.
  */
-export interface PlateState {
-  grams: Record<string, number>;
-  parts?: number;
-  cooked?: number | null;
+export function usePlate(recipeId: string): [PlateState | null, (p: PlateState) => void, () => void] {
+  const stored = useLiveQuery(async () => (await db.plates.get(recipeId)) ?? null, [recipeId]);
+  const [plate, setLocal] = useState<PlateState | null>(null);
+  const [loadedFor, setLoadedFor] = useState<string | null>(null);
+  useEffect(() => {
+    if (stored === undefined || loadedFor === recipeId) return;
+    setLocal(stored ?? { grams: {} });
+    setLoadedFor(recipeId);
+  }, [stored, recipeId, loadedFor]);
+  const set = useCallback(
+    (p: PlateState) => {
+      const next = { ...p, updatedAt: Date.now() };
+      setLocal(next);
+      void db.plates.put({ ...next, recipeId });
+    },
+    [recipeId]
+  );
+  const clear = useCallback(() => {
+    setLocal({ grams: {} });
+    void db.plates.delete(recipeId);
+  }, [recipeId]);
+  return [loadedFor === recipeId ? plate : null, set, clear];
 }
 
-export function plateKey(recipeId: string): string {
-  return `foody:plate2:${recipeId}`;
-}
-export function cookNoteKey(recipeId: string): string {
-  return `foody:cooknote:${recipeId}`;
+/** Has the user entered anything for this cooking yet? */
+export function plateTouched(p: PlateState | null, usualParts: number, usual: Record<string, number>): boolean {
+  if (!p) return false;
+  return Object.entries(p.grams).some(([k, g]) => usual[k] !== g) || (!!p.parts && p.parts !== usualParts) || !!p.cooked || !!p.note;
 }

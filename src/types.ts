@@ -78,5 +78,33 @@ export interface Photo {
   createdAt: number;
 }
 
+/**
+ * What the user entered for the cooking in progress (Porsiyonum): grams put in
+ * (whole recipe), how many portions, cooked weight, notes. Kept on the device
+ * until the cooking is saved as an attempt or the user resets it.
+ */
+export interface Plate {
+  recipeId: string;
+  grams: Record<string, number>;
+  parts?: number;
+  cooked?: number | null;
+  note?: string;
+  /** The "Pişirdim, puanla" form while it is being filled. */
+  taslak?: AttemptDraft;
+  updatedAt: number;
+}
+
+export interface AttemptDraft {
+  score: number;
+  rated: boolean;
+  method: string;
+  temp: string;
+  time: string;
+  date: string;
+  foto?: string;
+  makeDefault: boolean;
+  best: boolean;
+}
+
 export const KATEGORILER = ['Kahvaltı', 'Ana yemek', 'Çorba', 'Salata', 'Tatlı', 'Atıştırmalık', 'İçecek'];
 export const YONTEMLER = ['Tava', 'Fırın', 'Air fryer', 'Ocak', 'Döküm tava', 'Izgara', 'Fırınsız'];

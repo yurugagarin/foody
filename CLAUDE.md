@@ -17,6 +17,7 @@ Uygulama açılışta `syncSeed()` (`src/lib/seed.ts`) ile cihaza henüz gelmemi
 
 - Gezinme: geri/kapat/kaydet tuşları `useGoBack()` (`src/lib/hooks.ts`) kullanır; alt ekrandan (düzenle, puanla, pişirme) dönüşte yeni sayfa açma (`nav(-1)` ya da `replace`). Gezinmeye dokunduysan `npm run build`, `npx vite preview --port 4173` ve `node scripts/geri-testi.cjs` çalıştır; hepsi OK olmalı.
 
+- Kullanıcının girdiği hiçbir şey kaybolmamalı: Porsiyonum gramları, puanlama formu ve notlar `plates` tablosunda (`usePlate()`), düzenleme/yapıştırma taslakları `meta`'da her değişiklikte cihaza yazılır. Yeni bir giriş alanı eklersen o da böyle kalıcı olmalı; `sessionStorage` ya da sadece React state'i kullanma. Değişiklikten sonra `node scripts/kalicilik-testi.cjs` çalıştır.
 - Gramlar her zaman çiğ/kuru; "kuru/çiğ" etiketi kullanma.
 - Kullanıcı verisi (fotoğraflar, puanlar, gram düzenlemeleri) cihazda IndexedDB'de; repoda değil.
 - Logo `public/logo.svg`; değişince `npm run icons`.

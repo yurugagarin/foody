@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
-import { cookNoteKey, plateKey, useGoBack, useLibrary, useSessionState, type PlateState } from '../lib/hooks';
+import { useGoBack, useLibrary, usePlate } from '../lib/hooks';
 import { portionOf, recipeTotals, parseNum } from '../lib/nutrition';
 import { stats } from '../lib/score';
 import { addAttempt } from '../lib/repo';
-import { YONTEMLER } from '../types';
+import { YONTEMLER, type AttemptDraft } from '../types';
 import { Badges } from '../components/Badges';
 import { PhotoPicker, PhotoView } from '../components/Photo';
 import { Icon } from '../components/Icon';
@@ -23,22 +23,24 @@ export function RateAttempt() {
   const recipe = useLiveQuery(() => db.recipes.get(id), [id]);
   const attempts = useLiveQuery(() => db.attempts.where('recipeId').equals(id).toArray(), [id]);
   const lib = useLibrary();
-  const [plate, setPlate] = useSessionState<PlateState>(plateKey(id), { grams: {} });
-  const [cookNote, setCookNote] = useSessionState<string>(cookNoteKey(id), '');
-  const [score, setScore] = useState(8);
-  const [rated, setRated] = useState(true);
-  const [method, setMethod] = useState<string>('');
-  const [temp, setTemp] = useState('');
-  const [time, setTime] = useState('');
-  const [note, setNote] = useState<string | null>(null);
-  const [date, setDate] = useState(today());
-  const [foto, setFoto] = useState<string>();
-  const [makeDefault, setMakeDefault] = useState(false);
-  const [best, setBest] = useState(false);
+  const [plate, setPlate] = usePlate(id);
   const [saving, setSaving] = useState(false);
   const goBack = useGoBack();
 
-  if (!recipe || !attempts || !lib) return null;
+  if (!recipe || !attempts || !lib || !plate) return null;
+  // Everything in this form is saved on the device as it is typed.
+  const dr: AttemptDraft = { score: 8, rated: true, method: '', temp: '', time: '', date: today(), makeDefault: false, best: false, ...plate.taslak };
+  const upd = (p: Partial<AttemptDraft>) => setPlate({ ...plate, taslak: { ...dr, ...p } });
+  const { score, rated, method, temp, time, date, foto, makeDefault, best } = dr;
+  const setScore = (score: number) => upd({ score });
+  const setRated = (rated: boolean) => upd({ rated });
+  const setMethod = (method: string) => upd({ method });
+  const setTemp = (temp: string) => upd({ temp });
+  const setTime = (time: string) => upd({ time });
+  const setDate = (date: string) => upd({ date });
+  const setFoto = (foto: string) => upd({ foto });
+  const setMakeDefault = (makeDefault: boolean) => upd({ makeDefault });
+  const setBest = (best: boolean) => upd({ best });
   const st = stats(attempts);
   const ratedList = attempts.filter((a) => a.puan != null).map((a) => a.puan as number);
   const newAvg = rated ? (ratedList.reduce((s, x) => s + x, 0) + score) / (ratedList.length + 1) : st.avg;
@@ -50,7 +52,7 @@ export function RateAttempt() {
       const d = plate.grams[m.ingId] - m.gram;
       return `${lib.get(m.ingId)?.ad} ${d > 0 ? '+' : ''}${String(Math.round(d * 10) / 10).replace('.', ',')} g`;
     });
-  const noteValue = note ?? cookNote;
+  const noteValue = plate.note ?? '';
 
   const save = async () => {
     setSaving(true);
@@ -74,8 +76,8 @@ export function RateAttempt() {
       },
       { makeDefault }
     );
-    setCookNote('');
-    if (makeDefault) setPlate({ grams: {} });
+    // The grams stay in Porsiyonum (and are saved with the attempt); only the note is done.
+    setPlate(makeDefault ? { grams: {}, cooked: plate.cooked } : { ...plate, note: '', taslak: undefined });
     goBack(`/tarif/${recipe.id}`);
   };
 
@@ -128,8 +130,7 @@ export function RateAttempt() {
 
       <label className="field">
         <span className="lab">Notların · ne değişti, ne daha iyi oldu?</span>
-        {cookNote && note == null && <span className="small gold">Pişirirken düştüğün not eklendi</span>}
-        <textarea className="textarea sf it" rows={4} style={{ fontSize: 20, lineHeight: 1.3 }} value={noteValue} onChange={(e) => setNote(e.target.value)} placeholder="Örn. airfryer'da 160 °C'de 14 dk, daha iyi oldu." />
+        <textarea className="textarea sf it" rows={4} style={{ fontSize: 20, lineHeight: 1.3 }} value={noteValue} onChange={(e) => setPlate({ ...plate, note: e.target.value })} placeholder="Örn. airfryer'da 160 °C'de 14 dk, daha iyi oldu." />
       </label>
 
       <section className="row" style={{ gap: 14 }}>

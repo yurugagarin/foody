@@ -1,5 +1,5 @@
 import Dexie, { type Table } from 'dexie';
-import type { Attempt, Ingredient, Photo, Recipe } from './types';
+import type { Attempt, Ingredient, Photo, Plate, Recipe } from './types';
 
 /** Everything lives on the device, in IndexedDB. */
 export class FoodyDB extends Dexie {
@@ -7,6 +7,7 @@ export class FoodyDB extends Dexie {
   recipes!: Table<Recipe, string>;
   attempts!: Table<Attempt, string>;
   photos!: Table<Photo, string>;
+  plates!: Table<Plate, string>;
   meta!: Table<{ key: string; value: unknown }, string>;
 
   constructor(name = 'foody') {
@@ -18,6 +19,7 @@ export class FoodyDB extends Dexie {
       photos: 'id',
       meta: 'key'
     });
+    this.version(2).stores({ plates: 'recipeId' });
   }
 }
 
