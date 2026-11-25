@@ -19,7 +19,8 @@ describe('importer', () => {
       'Protein Brownie (Islak Kek)',
       'Lokanta Usulü Yumuşak Köfte',
       'Somonlu Makarna (Kremasız)',
-      'Kolay Yoğurt Cheesecake'
+      'Kolay Yoğurt Cheesecake',
+      'Tavuklu Makarna (kremasız)'
     ]);
     for (const r of recipes) expect(Math.abs(draftTotals(r).kcal - r.kontrol!.kcal)).toBeLessThan(1);
     expect(recipes[1].birim).toBe('köfte');
@@ -128,8 +129,9 @@ describe('repo', () => {
     expect(names.filter((n) => n === 'Kakao').length).toBe(1);
     expect(names.filter((n) => n === 'Zeytinyağı').length).toBe(1);
     expect(ings.find((i) => i.ad === 'Zeytinyağı')?.temel).toBe(true);
-    expect(await db.recipes.count()).toBe(4);
+    expect(await db.recipes.count()).toBe(5);
     expect(await db.attempts.count()).toBe(4);
+    expect(names.filter((n) => n === 'Makarna').length).toBe(1);
   });
 
   it('flags changed and missing values when importing again', async () => {
@@ -155,7 +157,7 @@ describe('seed sync', () => {
   });
 
   it('adds only recipes the device has not received, and never brings back a deleted one', async () => {
-    expect(await syncSeed()).toBe(4);
+    expect(await syncSeed()).toBe(5);
     expect(await syncSeed()).toBe(0);
     const kofte = (await db.recipes.toArray()).find((r) => r.ad.startsWith('Lokanta'))!;
     await db.recipes.delete(kofte.id);
