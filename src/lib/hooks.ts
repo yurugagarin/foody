@@ -1,0 +1,75 @@
+import { useLiveQuery } from 'dexie-react-hooks';
+import { useCallback, useEffect, useState } from 'react';
+import { db } from '../db';
+import type { Attempt, Ingredient, Recipe } from '../types';
+import { stats, type Stats } from './score';
+
+export function useLibrary(): Map<string, Ingredient> | undefined {
+  return useLiveQuery(async () => new Map((await db.ingredients.toArray()).map((i) => [i.id, i])), []);
+}
+
+export interface RecipeWithStats {
+  recipe: Recipe;
+  attempts: Attempt[];
+  stats: Stats;
+}
+
+export function useRecipes(): RecipeWithStats[] | undefined {
+  return useLiveQuery(async () => {
+    const [recipes, attempts] = await Promise.all([db.recipes.toArray(), db.attempts.toArray()]);
+    const by = new Map<string, Attempt[]>();
+    for (const a of attempts) by.set(a.recipeId, [...(by.get(a.recipeId) ?? []), a]);
+    return recipes.map((recipe) => {
+      const list = by.get(recipe.id) ?? [];
+      return { recipe, attempts: list, stats: stats(list) };
+    });
+  }, []);
+}
+
+/** State kept for the browser session (survives going to cook mode and back). */
+export function useSessionState<T>(key: string, initial: T): [T, (v: T) => void] {
+  const [v, setV] = useState<T>(() => {
+    try {
+      const s = sessionStorage.getItem(key);
+      return s ? (JSON.parse(s) as T) : initial;
+    } catch {
+      return initial;
+    }
+  });
+  useEffect(() => {
+    sessionStorage.setItem(key, JSON.stringify(v));
+  }, [key, v]);
+  return [v, setV];
+}
+
+export function useToast(): [string | null, (msg: string) => void] {
+  const [msg, setMsg] = useState<string | null>(null);
+  useEffect(() => {
+    if (!msg) return;
+    const t = setTimeout(() => setMsg(null), 2400);
+    return () => clearTimeout(t);
+  }, [msg]);
+  return [msg, useCallback((m: string) => setMsg(m), [])];
+}
+
+export async function copyText(text: string): Promise<boolean> {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** Per-recipe "Porsiyonum" state: grams this time and how much was eaten. */
+export interface PlateState {
+  grams: Record<string, number>;
+  eaten: number;
+}
+
+export function plateKey(recipeId: string): string {
+  return `foody:plate:${recipeId}`;
+}
+export function cookNoteKey(recipeId: string): string {
+  return `foody:cooknote:${recipeId}`;
+}

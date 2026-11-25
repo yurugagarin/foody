@@ -1,0 +1,142 @@
+{
+  "tarifler": [
+    {
+      "ad": "Protein Brownie (Islak Kek)",
+      "kategori": "Tatlı",
+      "porsiyon": 1,
+      "sure_dk": 20,
+      "kaynak": "Yapay zekâ sohbeti",
+      "etiketler": ["yüksek protein", "air fryer"],
+      "malzemeler": [
+        { "ad": "Whey protein tozu", "gram": 40, "her_100g": { "kcal": 380, "protein": 75, "karb": 8, "yag": 6 }, "not": "1 ölçek" },
+        { "ad": "Un", "gram": 30, "her_100g": { "kcal": 343, "protein": 10, "karb": 71, "yag": 1 }, "not": "" },
+        { "ad": "Kakao", "gram": 50, "her_100g": { "kcal": 366, "protein": 20, "karb": 8.9, "yag": 21 }, "not": "Dr. Oetker" },
+        { "ad": "Kabartma tozu", "gram": 4, "her_100g": { "kcal": 0, "protein": 0, "karb": 0, "yag": 0 }, "not": "1 çay kaşığı (Backpulver)" },
+        { "ad": "Yumurta", "gram": 55, "her_100g": { "kcal": 143, "protein": 12.6, "karb": 0.7, "yag": 9.5 }, "not": "1 adet, kabuksuz" },
+        { "ad": "Süzme yoğurt (%3,5)", "gram": 100, "her_100g": { "kcal": 80, "protein": 7, "karb": 4, "yag": 3.5 }, "not": "Ömür, yaklaşık 4 yemek kaşığı" },
+        { "ad": "Zeytinyağı", "gram": 5, "her_100g": { "kcal": 884, "protein": 0, "karb": 0, "yag": 100 }, "not": "1 silme çay kaşığı" },
+        { "ad": "Tatlandırıcı", "gram": 1, "her_100g": { "kcal": 0, "protein": 0, "karb": 0, "yag": 0 }, "not": "3 ölçek" },
+        { "ad": "Soda", "gram": 80, "her_100g": { "kcal": 0, "protein": 0, "karb": 0, "yag": 0 }, "not": "Kıvama göre" },
+        { "ad": "Ceviz", "gram": 30, "her_100g": { "kcal": 712, "protein": 15.5, "karb": 3.7, "yag": 69.1 }, "not": "Lidl" }
+      ],
+      "adimlar": [
+        { "sira": 1, "metin": "Air fryer'ı önceden ısıt.", "sure_dk": 3, "derece_c": 150 },
+        { "sira": 2, "metin": "Whey, un, kakao, kabartma tozu ve tatlandırıcıyı bir kapta karıştır.", "sure_dk": null, "derece_c": null },
+        { "sira": 3, "metin": "Yumurta, yoğurt ve zeytinyağını ayrı bir kapta çırpıp kuru malzemelere ekle.", "sure_dk": null, "derece_c": null },
+        { "sira": 4, "metin": "Sodayı azar azar ekleyerek kıvam ver, cevizi kat.", "sure_dk": null, "derece_c": null },
+        { "sira": 5, "metin": "Kalıba dök ve air fryer'da pişir.", "sure_dk": 12, "derece_c": 150 },
+        { "sira": 6, "metin": "İçi hafif cıvık çıkar. Buzdolabında birkaç saat bekletince katılaşır.", "sure_dk": null, "derece_c": null }
+      ],
+      "notlar": "Tarifin tamamı 1 porsiyon. 2 porsiyon için tüm miktarları 2 katına çıkar.",
+      "denemeler": [
+        { "tarih": null, "puan_10": null, "yontem": "Air fryer", "derece_c": 150, "sure_dk": 12, "not": "Kasım 2026, bu son sürüm. Çok beğendin: içi hafif sulu, çatalla yenen bir kek oldu." },
+        { "tarih": null, "puan_10": null, "yontem": "Air fryer", "derece_c": 150, "sure_dk": 15, "not": "Ekim 2026 ara sürümü. Yoğurt yerine 4 yemek kaşığı REWE Bio quark, 2 ölçekten biraz fazla tatlandırıcı ve yaklaşık 100 ml soda kullanıldı, ceviz konmadı. 150–155 °C'de 15–18 dakika pişti." },
+        { "tarih": null, "puan_10": null, "yontem": "Air fryer", "derece_c": 150, "sure_dk": 12, "not": "Eski tarif. 1,5 ölçek whey, 30 g un, 50 g kakao, 1 çay kaşığı kabartma tozu, 200 ml soda, 2 ölçekten biraz fazla tatlandırıcı; yumurta ve yoğurt yok, ceviz isteğe bağlı. 150–155 °C'de 12–15 dakika pişti." }
+      ],
+      "kontrol_toplam": { "kcal": 854.4, "protein": 61.6, "karb": 34.4, "yag": 47.7 }
+    },
+    {
+      "ad": "Lokanta Usulü Yumuşak Köfte",
+      "kategori": "Ana yemek",
+      "porsiyon": 4,
+      "birim": "köfte",
+      "birim_adet": 16,
+      "sure_dk": 30,
+      "kaynak": "Yapay zekâ sohbeti",
+      "etiketler": ["yüksek protein", "köfte", "döküm tava"],
+      "malzemeler": [
+        { "ad": "Kıyma (%10 yağlı)", "gram": 500, "her_100g": { "kcal": 176, "protein": 20, "karb": 0, "yag": 10 }, "not": "" },
+        { "ad": "Galeta unu", "gram": 20, "her_100g": { "kcal": 395, "protein": 13.4, "karb": 71.5, "yag": 5.3 }, "not": "" },
+        { "ad": "Soda", "gram": 40, "her_100g": { "kcal": 0, "protein": 0, "karb": 0, "yag": 0 }, "not": "Galeta ununu ıslatmak için. Harç kuru kalırsa ayrıca en fazla 20 g buz gibi soda" },
+        { "ad": "Soğan suyu", "gram": 60, "her_100g": { "kcal": 33, "protein": 0.5, "karb": 8, "yag": 0 }, "not": "1 orta boy soğandan (120 g), posası atılır" },
+        { "ad": "Sarımsak", "gram": 5, "her_100g": { "kcal": 149, "protein": 6.4, "karb": 33, "yag": 0.5 }, "not": "1 diş, ezilmiş" },
+        { "ad": "Tuz", "gram": 8, "her_100g": { "kcal": 0, "protein": 0, "karb": 0, "yag": 0 }, "not": "" },
+        { "ad": "Karabiber", "gram": 1, "her_100g": { "kcal": 0, "protein": 0, "karb": 0, "yag": 0 }, "not": "" },
+        { "ad": "Kimyon", "gram": 1, "her_100g": { "kcal": 0, "protein": 0, "karb": 0, "yag": 0 }, "not": "" },
+        { "ad": "Pul biber", "gram": 1, "her_100g": { "kcal": 0, "protein": 0, "karb": 0, "yag": 0 }, "not": "" },
+        { "ad": "Karbonat", "gram": 1, "her_100g": { "kcal": 0, "protein": 0, "karb": 0, "yag": 0 }, "not": "" },
+        { "ad": "Zeytinyağı", "gram": 5, "her_100g": { "kcal": 884, "protein": 0, "karb": 0, "yag": 100 }, "not": "Tavaya sürmek için" }
+      ],
+      "adimlar": [
+        { "sira": 1, "metin": "Galeta ununu 40 g sodayla karıştır, lapa kıvamına gelene kadar beklet.", "sure_dk": 5, "derece_c": null },
+        { "sira": 2, "metin": "Soğanı rendele, süzgeçte bastırıp suyunu al, posayı at.", "sure_dk": null, "derece_c": null },
+        { "sira": 3, "metin": "Kıymaya tuz, karabiber, kimyon, pul biber ve karbonatı ekle. Avuç içiyle bastırıp katlayarak yoğur. Parmak arasından ezme, eller ısınırsa soğuk suyla ıslat.", "sure_dk": 3, "derece_c": null },
+        { "sira": 4, "metin": "Islak galeta, soğan suyu ve sarımsağı ekleyip yoğurmaya devam et. Harç kuru kalırsa sodayı azar azar ekle. Harç ele yapışıp lif lif uzayınca hazırdır. Toplam yoğurma 10 dakikayı geçmesin.", "sure_dk": 4, "derece_c": null },
+        { "sira": 5, "metin": "Ceviz büyüklüğünde bir parça pişirip tadına bak, gerekirse tuzu ayarla.", "sure_dk": null, "derece_c": null },
+        { "sira": 6, "metin": "Kabın üstünü kapatıp buzdolabında dinlendir. Bu en az 2 saat sürmeli, ideali bir gece.", "sure_dk": 120, "derece_c": null },
+        { "sira": 7, "metin": "Elini ıslatıp harçtan 16 eşit parça al, bastırmadan hafif yassı şekil ver.", "sure_dk": null, "derece_c": null },
+        { "sira": 8, "metin": "Döküm tavayı duman çıkana kadar ısıt ve zeytinyağını sür. Köfteleri dizip hiç dokunmadan pişir.", "sure_dk": 3, "derece_c": null },
+        { "sira": 9, "metin": "Bir kez çevirip öbür yüzünü 2–3 dakika pişir. Köfteleri bastırma.", "sure_dk": 3, "derece_c": null },
+        { "sira": 10, "metin": "Ocaktan alıp dinlendir, sonra servis et.", "sure_dk": 2, "derece_c": null }
+      ],
+      "notlar": "Süreye 2 saatlik dinlendirme dahil değil. Yumurta bilerek konmuyor, çünkü köfteyi sertleştiriyor. Maydanoz isteğe bağlı: 10 g'ı çok ince kıyıp kurula ve 4. adımda ekle. Toplam 16 köfte çıkar.",
+      "denemeler": [
+        { "tarih": "2026-11-18", "puan_10": null, "yontem": "Döküm tava", "derece_c": null, "sure_dk": null, "not": "17 Kasım'da harcı hazırlayıp buzlukta beklettin, 18 Kasım'da döküm tavada pişirdin. Puan ve sonuç konuşulmadı." }
+      ],
+      "kontrol_toplam": { "kcal": 1030.5, "protein": 103.3, "karb": 20.8, "yag": 56.1 }
+    },
+    {
+      "ad": "Somonlu Makarna (Kremasız)",
+      "kategori": "Ana yemek",
+      "porsiyon": 1,
+      "sure_dk": 25,
+      "kaynak": "Yapay zekâ sohbeti",
+      "etiketler": ["yüksek protein", "kremasız"],
+      "malzemeler": [
+        { "ad": "Somon", "gram": 250, "her_100g": { "kcal": 208, "protein": 20, "karb": 0, "yag": 13.2 }, "not": "Derisiz, 2 parça" },
+        { "ad": "Makarna", "gram": 80, "her_100g": { "kcal": 359, "protein": 13, "karb": 71, "yag": 2 }, "not": "Barilla penne, kuru" },
+        { "ad": "Domates", "gram": 250, "her_100g": { "kcal": 18, "protein": 0.9, "karb": 2.6, "yag": 0.2 }, "not": "2 orta boy" },
+        { "ad": "Maydanoz", "gram": 25, "her_100g": { "kcal": 36, "protein": 3, "karb": 3.3, "yag": 0.8 }, "not": "Yarım demet, saplar hariç" },
+        { "ad": "Limon suyu", "gram": 20, "her_100g": { "kcal": 22, "protein": 0.4, "karb": 6.9, "yag": 0.2 }, "not": "Yarım limon" },
+        { "ad": "Zeytinyağı", "gram": 5, "her_100g": { "kcal": 884, "protein": 0, "karb": 0, "yag": 100 }, "not": "1 tatlı kaşığı" },
+        { "ad": "Tuz", "gram": 3, "her_100g": { "kcal": 0, "protein": 0, "karb": 0, "yag": 0 }, "not": "Haşlama suyuna ayrıca 1 yemek kaşığı" },
+        { "ad": "Karabiber", "gram": 1, "her_100g": { "kcal": 0, "protein": 0, "karb": 0, "yag": 0 }, "not": "" }
+      ],
+      "adimlar": [
+        { "sira": 1, "metin": "Büyük bir tencerede 2 litre suyu en yüksek ateşe koy.", "sure_dk": null, "derece_c": null },
+        { "sira": 2, "metin": "Domatesi soymadan, sap kısmını atıp 1 cm küp doğra. Maydanozun kalın saplarını atıp yapraklarını ince kıy. Limonu sık.", "sure_dk": 5, "derece_c": null },
+        { "sira": 3, "metin": "Somonu kâğıt havluyla kurula, iki yüzüne tuz ve karabiber serp.", "sure_dk": null, "derece_c": null },
+        { "sira": 4, "metin": "Yapışmaz tavayı orta-yüksek ateşte ısıt ve zeytinyağını koy. Somonu hiç oynatmadan pişir.", "sure_dk": 4, "derece_c": null },
+        { "sira": 5, "metin": "Somonu çevirip 2–3 dakika daha pişir. Tabağa al, tavayı yıkama.", "sure_dk": 3, "derece_c": null },
+        { "sira": 6, "metin": "Su kaynayınca 1 yemek kaşığı tuz ekle. Makarnayı paketteki süreden 1 dakika eksik haşla.", "sure_dk": 10, "derece_c": null },
+        { "sira": 7, "metin": "Makarna haşlanırken aynı tavada domatesi bir tutam tuzla orta ateşte pişir. Yumuşayınca kaşıkla hafif ez.", "sure_dk": 6, "derece_c": null },
+        { "sira": 8, "metin": "Süzmeden önce 1 çay bardağı haşlama suyunu ayır, sonra makarnayı süz.", "sure_dk": null, "derece_c": null },
+        { "sira": 9, "metin": "Makarnayı tavaya al. Ayırdığın suyun yarısını ekleyip sos makarnaya tutunana kadar karıştır.", "sure_dk": 2, "derece_c": null },
+        { "sira": 10, "metin": "Ocağı kapat. Somonu çatalla iri parçalara ayırıp ekle, maydanoz, limon suyu ve karabiberle yavaşça karıştır. Kuru kalırsa biraz daha makarna suyu ekle, tuzu kontrol et.", "sure_dk": null, "derece_c": null }
+      ],
+      "notlar": "Maydanoz en sonda, ocak kapalıyken eklenir. Zeytinyağı koymazsan 44 kcal düşer. Makarnayı 100 g yaparsan 72 kcal artar.",
+      "denemeler": [],
+      "kontrol_toplam": { "kcal": 909.8, "protein": 63.5, "karb": 65.5, "yag": 40.3 }
+    },
+    {
+      "ad": "Kolay Yoğurt Cheesecake",
+      "kategori": "Tatlı",
+      "porsiyon": 6,
+      "birim": "dilim",
+      "birim_adet": 6,
+      "sure_dk": 45,
+      "kaynak": "Yapay zekâ sohbeti",
+      "etiketler": ["fırın", "protein soslu"],
+      "malzemeler": [
+        { "ad": "Yoğurt", "gram": 500, "her_100g": { "kcal": 61, "protein": 3.5, "karb": 4.7, "yag": 3.3 }, "not": "Klasik yoğurt" },
+        { "ad": "Yumurta", "gram": 220, "her_100g": { "kcal": 143, "protein": 12.6, "karb": 0.7, "yag": 9.5 }, "not": "4 adet, kabuksuz" },
+        { "ad": "Rice cream", "gram": 75, "her_100g": { "kcal": 370, "protein": 6.5, "karb": 82, "yag": 0.8 }, "not": "" },
+        { "ad": "Whey protein tozu", "gram": 30, "her_100g": { "kcal": 380, "protein": 75, "karb": 8, "yag": 6 }, "not": "Sos için" },
+        { "ad": "Kakao", "gram": 5, "her_100g": { "kcal": 366, "protein": 20, "karb": 8.9, "yag": 21 }, "not": "Sos için, 1 tatlı kaşığı (Dr. Oetker)" },
+        { "ad": "Su", "gram": 20, "her_100g": { "kcal": 0, "protein": 0, "karb": 0, "yag": 0 }, "not": "Sos için, kıvam alana kadar" }
+      ],
+      "adimlar": [
+        { "sira": 1, "metin": "Malzemeleri oda sıcaklığına getir. Fırını önceden ısıt.", "sure_dk": null, "derece_c": 180 },
+        { "sira": 2, "metin": "Yoğurt, yumurta ve rice cream'i pürüzsüz olana kadar çırp, çok uzun karıştırma.", "sure_dk": 3, "derece_c": null },
+        { "sira": 3, "metin": "Karışımı yağlı kağıt serili küçük bir fırın kabına dök.", "sure_dk": null, "derece_c": null },
+        { "sira": 4, "metin": "Fırında pişir. Ortası hafif titriyorken çıkar.", "sure_dk": 30, "derece_c": 180 },
+        { "sira": 5, "metin": "Ilınınca buzdolabında en az 3–4 saat soğut.", "sure_dk": 180, "derece_c": null },
+        { "sira": 6, "metin": "Protein tozu ve kakaoyu suyu azar azar ekleyerek karıştır, sosu üstüne yay.", "sure_dk": null, "derece_c": null },
+        { "sira": 7, "metin": "6 dilime böl.", "sure_dk": null, "derece_c": null }
+      ],
+      "notlar": "Süreye soğutma dahil değil. Rice cream yerine sade pirinç unu, 4 yemek kaşığı şekere denk tatlandırıcı ve vanilya kullanılabilir. Pirinç unu yerine 40 g mısır nişastası da olur. 1 dilim sossuz yaklaşık 150 kcal, soslu yaklaşık 172 kcal.",
+      "denemeler": [],
+      "kontrol_toplam": { "kcal": 1029.4, "protein": 73.6, "karb": 89.4, "yag": 40.9 }
+    }
+  ]
+}
