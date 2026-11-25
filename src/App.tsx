@@ -31,6 +31,7 @@ function Shell() {
   const cooking = pathname.endsWith('/pisir');
   return (
     <div className="shell">
+      <div className="statusbar" aria-hidden="true" />
       {!cooking && (
         <aside className="side" aria-label="Menü">
           <div style={{ padding: '0 6px 18px' }}><Brand /></div>

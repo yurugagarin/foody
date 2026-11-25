@@ -97,16 +97,6 @@ export function Gallery() {
           </div>
         </section>
       )}
-
-      <Link to="/dolap" className="dashed row" style={{ textDecoration: 'none', color: 'var(--text)' }}>
-        <span className="icon-btn" style={{ borderColor: 'var(--gold)', color: 'var(--gold)', background: 'var(--panel)' }}><Icon name="fridge" /></span>
-        <span className="grow stack" style={{ gap: 2 }}>
-          <span className="sf it" style={{ fontSize: 22, lineHeight: 1 }}>Dolabımda ne var?</span>
-          <span className="small muted">Elindekilerle hangi tarifini yapabilirsin</span>
-        </span>
-        <Icon name="next" />
-      </Link>
-
       <div className="stack" style={{ gap: 10 }}>
         <label className="row input" style={{ borderRadius: 99 }}>
           <Icon name="search" size={16} />
