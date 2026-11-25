@@ -288,6 +288,7 @@ function AttemptCard({ a, recipe, lib, onUse }: { a: Attempt; recipe: Recipe; li
         )}
         {a.not && <span className="sf it" style={{ fontSize: 18, lineHeight: 1.28 }}>“{a.not}”</span>}
         <div className="row wrap" style={{ gap: 6, marginTop: 4 }}>
+          <Link className="btn sm" to={`/tarif/${recipe.id}/deneme/${a.id}`}><Icon name="edit" size={14} />Düzenle</Link>
           <button className="btn sm" onClick={() => setBest(a)}><Icon name="star" size={14} fill={!!a.enIyi} />{a.enIyi ? 'En iyi' : 'En iyi yap'}</button>
           {onUse && <button className="btn sm" onClick={onUse}>Bu gramları kullan</button>}
           <button

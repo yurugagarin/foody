@@ -104,6 +104,8 @@ export interface AttemptDraft {
   foto?: string;
   makeDefault: boolean;
   best: boolean;
+  /** Only used when editing a saved attempt (a new one keeps its note in Plate.note). */
+  note?: string;
 }
 
 export const KATEGORILER = ['Kahvaltı', 'Ana yemek', 'Çorba', 'Salata', 'Tatlı', 'Atıştırmalık', 'İçecek'];

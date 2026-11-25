@@ -4,7 +4,7 @@ import { Icon } from './components/Icon';
 import { Gallery } from './pages/Gallery';
 import { RecipeDetail } from './pages/RecipeDetail';
 import { CookMode } from './pages/CookMode';
-import { RateAttempt } from './pages/RateAttempt';
+import { EditAttempt, RateAttempt } from './pages/RateAttempt';
 import { Pantry } from './pages/Pantry';
 import { Library } from './pages/Library';
 import { Editor } from './pages/Editor';
@@ -53,6 +53,7 @@ function Shell() {
           <Route path="/tarif/:id" element={<RecipeDetail />} />
           <Route path="/tarif/:id/pisir" element={<CookMode />} />
           <Route path="/tarif/:id/puanla" element={<RateAttempt />} />
+          <Route path="/tarif/:id/deneme/:aid" element={<EditAttempt />} />
           <Route path="/tarif/:id/duzenle" element={<Editor />} />
           <Route path="/yeni" element={<Editor />} />
           <Route path="/dolap" element={<Pantry />} />

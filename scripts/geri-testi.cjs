@@ -44,6 +44,13 @@ const V = (sel) => sel + ' >> visible=true';
   await p.click(V('text=Pişirdim, puanla'));
   await p.click(V('text=Gramları değiştir')); await expectHash(p, D, 'puanla → Gramları değiştir → tarif');
   await p.click(V('[aria-label="Geri"]')); await expectHash(p, G, 'D: geri → galeri');
+  // C2: edit a saved attempt
+  await openTile('Kolay Yoğurt Cheesecake');
+  await p.click(V('a:has-text("Düzenle") >> nth=0')); await expectHash(p, /\/deneme\/[^/]+$/, 'tarif → denemeyi düzenle');
+  await p.click(V('[aria-label="Kapat"]')); await expectHash(p, D, 'deneme düzenle → X → tarif');
+  await p.click(V('a:has-text("Düzenle") >> nth=0'));
+  await p.click(V('text=Değişiklikleri kaydet')); await expectHash(p, D, 'deneme düzenle → kaydet → tarif');
+  await p.click(V('[aria-label="Geri"]')); await expectHash(p, G, 'C2: geri → galeri');
   // E: cook mode close, cook to the end and rate
   await openTile('Kolay Yoğurt Cheesecake');
   await p.click(V('text=Pişirme modu')); await expectHash(p, /pisir$/, 'tarif → pişirme modu');

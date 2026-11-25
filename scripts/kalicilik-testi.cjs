@@ -58,6 +58,25 @@ function check(ok, label, got) {
   check((await p.inputValue(V('[aria-label="Kıyma (%10 yağlı) gram"]'))) === '500', '"Her zamanki" (onaylayınca) 500 g’a döner');
   await p.close();
 
+  p = await open(recipe);
+  await p.click(V('a:has-text("Düzenle") >> nth=0'));
+  await p.waitForTimeout(500);
+  const attemptUrl = new URL(p.url()).hash;
+  check((await p.inputValue(V('textarea'))) === 'Kıymayı 520 g yaptım', 'deneme düzenlemede eski not dolu geliyor');
+  await p.fill(V('textarea'), 'Limon suyu fazla geldi');
+  await p.locator(V('#puan')).fill('4');
+  await p.waitForTimeout(400);
+  await p.close();
+  p = await open(attemptUrl);
+  check((await p.locator(V('text=Kaydetmediğin değişiklikler geri yüklendi')).count()) === 1, 'deneme düzenleme taslağı geri yüklendi');
+  check((await p.inputValue(V('textarea'))) === 'Limon suyu fazla geldi', 'kaydedilmemiş yeni not duruyor');
+  check((await p.inputValue(V('#puan'))) === '4', 'kaydedilmemiş yeni puan duruyor');
+  await p.click(V('text=Değişiklikleri kaydet'));
+  await p.waitForTimeout(700);
+  check((await p.locator(V('text=Limon suyu fazla geldi')).count()) > 0, 'yeni not tarifte görünüyor');
+  check((await p.locator(V('.attempt .sf >> text=/^4$/')).count()) > 0, 'yeni puan (4) tarifte görünüyor');
+  await p.close();
+
   p = await open(recipe + '/duzenle');
   await p.fill(V('input[placeholder="Somonlu makarna"]'), 'Köfte (değişti)');
   await p.waitForTimeout(400);

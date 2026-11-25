@@ -5,7 +5,7 @@ import { parseImport, draftTotals } from './importer';
 import { recipeTotals, portionOf, f1 } from './nutrition';
 import { stats, weight, weightedPick, sortAttempts } from './score';
 import { matchPantry } from './pantry';
-import { applyImport, resolveIngredients, saveRecipe, addAttempt } from './repo';
+import { applyImport, resolveIngredients, saveRecipe, addAttempt, updateAttempt } from './repo';
 import { db } from '../db';
 import { syncSeed } from './seed';
 import type { Ingredient } from '../types';
@@ -148,6 +148,25 @@ describe('repo', () => {
     const ingId = r.malzemeler[0].ingId;
     await addAttempt({ recipeId: id, tarih: '2026-11-25', puan: 9, gramlar: { [ingId]: 80 } }, { makeDefault: true });
     expect((await db.recipes.get(id))!.malzemeler[0].gram).toBe(80);
+  });
+});
+
+describe('editing an attempt', () => {
+  beforeEach(async () => {
+    await Promise.all(db.tables.map((t) => t.clear()));
+  });
+
+  it('changes score and note, keeps the grams, and moves the "best" mark', async () => {
+    const id = await saveRecipe(null, { ad: 'Yulaf', kategori: 'Kahvaltı', porsiyon: 1, etiketler: [], adimlar: [], malzemeler: [{ ad: 'Yulaf ezmesi', gram: 60, per100: { kcal: 389, protein: 16.9, karb: 66, yag: 6.9 } }] });
+    const a1 = await addAttempt({ recipeId: id, tarih: '2026-11-20', puan: 9, enIyi: true, gramlar: { x: 60 } });
+    const a2 = await addAttempt({ recipeId: id, tarih: '2026-11-24', puan: 6, not: 'iyi' });
+    await updateAttempt(a2, { puan: 4, not: 'Limon suyu fazla geldi', enIyi: true });
+    const after = await db.attempts.get(a2);
+    expect(after?.puan).toBe(4);
+    expect(after?.not).toBe('Limon suyu fazla geldi');
+    expect((await db.attempts.get(a1))?.enIyi).toBe(false);
+    expect((await db.attempts.get(a1))?.gramlar).toEqual({ x: 60 });
+    expect(stats(await db.attempts.toArray()).avg).toBe(6.5);
   });
 });
 

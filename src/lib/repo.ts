@@ -196,6 +196,20 @@ export async function addAttempt(a: Omit<Attempt, 'id' | 'createdAt'>, opts: { m
   return id;
 }
 
+/** Changes a saved attempt (score, notes, photo…). Its grams stay as they were cooked. */
+export async function updateAttempt(id: string, patch: Partial<Omit<Attempt, 'id' | 'recipeId' | 'createdAt' | 'gramlar'>>): Promise<void> {
+  await db.transaction('rw', db.attempts, db.photos, async () => {
+    const prev = await db.attempts.get(id);
+    if (!prev) return;
+    if (patch.enIyi) {
+      const others = await db.attempts.where('recipeId').equals(prev.recipeId).toArray();
+      await db.attempts.bulkPut(others.filter((o) => o.id !== id).map((o) => ({ ...o, enIyi: false })));
+    }
+    if ('fotoId' in patch && prev.fotoId && patch.fotoId !== prev.fotoId) await db.photos.delete(prev.fotoId);
+    await db.attempts.put({ ...prev, ...patch });
+  });
+}
+
 export async function setBest(attempt: Attempt): Promise<void> {
   await db.transaction('rw', db.attempts, async () => {
     const all = await db.attempts.where('recipeId').equals(attempt.recipeId).toArray();
