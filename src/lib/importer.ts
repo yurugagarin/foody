@@ -52,7 +52,6 @@ KURALLAR:
 - Adımlarda süre (dakika) ve derece (°C) varsa ayrı alanlara koy.
 - Tarifi daha önce yaptıysam ve konuştuysak "denemeler" alanına yaz, bilmiyorsan boş bırak.
 - "kontrol_toplam" alanına tarifin toplam kcal, protein, karb ve yağını yaz.
-- Tarif köfte, dilim gibi sayılabilir parçalara bölünüyorsa "birim" ve "birim_adet" ekle (ör. "köfte", 16).
 
 FORMAT:
 {
@@ -61,8 +60,6 @@ FORMAT:
       "ad": "Tarif adı",
       "kategori": "Kahvaltı | Ana yemek | Çorba | Salata | Tatlı | Atıştırmalık | İçecek",
       "porsiyon": 1,
-      "birim": null,
-      "birim_adet": null,
       "sure_dk": 20,
       "kaynak": "Yapay zekâ sohbeti",
       "etiketler": ["yüksek protein"],

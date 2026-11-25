@@ -237,13 +237,12 @@ function FormPanel({ id, lib, form, setForm }: { id: string | null; lib: Map<str
     if (bad.length) return setErr(`Yeni malzemelerin 100 g kalorisini gir: ${bad.map((b) => b.ad).join(', ')}.`);
     const n = (x: string) => (Number.isFinite(parseNum(x)) ? parseNum(x) : null);
     setBusy(true);
-    const birimAdet = n(form.birimAdet);
     const rid = await saveRecipe(id, {
       ad: form.ad.trim(),
       kategori: form.kategori,
       porsiyon: por,
-      birim: form.birim.trim() && birimAdet ? form.birim.trim() : undefined,
-      birimAdet: form.birim.trim() && birimAdet ? birimAdet : undefined,
+      birim: undefined,
+      birimAdet: undefined,
       sureDk: n(form.sureDk),
       kaynak: form.kaynak.trim() || undefined,
       etiketler: form.etiketler.split(',').map((t) => t.trim()).filter(Boolean),
@@ -267,8 +266,6 @@ function FormPanel({ id, lib, form, setForm }: { id: string | null; lib: Map<str
           </label>
           <label className="field"><span className="lab">Porsiyon</span><input className="input" inputMode="numeric" value={form.porsiyon} onChange={(e) => set({ porsiyon: e.target.value })} /></label>
           <label className="field"><span className="lab">Süre (dk)</span><input className="input" inputMode="numeric" value={form.sureDk} onChange={(e) => set({ sureDk: e.target.value })} /></label>
-          <label className="field"><span className="lab">Parça adı</span><input className="input" value={form.birim} onChange={(e) => set({ birim: e.target.value })} placeholder="köfte, dilim…" /></label>
-          <label className="field"><span className="lab">Kaç parça</span><input className="input" inputMode="numeric" value={form.birimAdet} onChange={(e) => set({ birimAdet: e.target.value })} placeholder="16" /></label>
           <label className="field"><span className="lab">Kaynak</span><input className="input" value={form.kaynak} onChange={(e) => set({ kaynak: e.target.value })} placeholder="Yapay zekâ sohbeti" /></label>
         </div>
         <label className="field"><span className="lab">Etiketler (virgülle)</span><input className="input" value={form.etiketler} onChange={(e) => set({ etiketler: e.target.value })} placeholder="yüksek protein, hızlı" /></label>

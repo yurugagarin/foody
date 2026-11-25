@@ -50,26 +50,9 @@ export function recipeTotals(
   return t;
 }
 
-/** Name of what is counted when eating: "köfte", "dilim" or "porsiyon". */
-export function unitName(r: Pick<Recipe, 'birim' | 'birimAdet'>): string {
-  return r.birim && r.birimAdet ? r.birim : 'porsiyon';
-}
-
-/** How many units the whole recipe makes. */
-export function unitCount(r: Pick<Recipe, 'porsiyon' | 'birim' | 'birimAdet'>): number {
-  return r.birim && r.birimAdet ? r.birimAdet : Math.max(1, r.porsiyon || 1);
-}
-
-/** Default amount eaten: one portion, expressed in units. */
-export function defaultEaten(r: Pick<Recipe, 'porsiyon' | 'birim' | 'birimAdet'>): number {
-  const units = unitCount(r);
-  const per = units / Math.max(1, r.porsiyon || 1);
-  return Math.max(1, Math.round(per * 2) / 2);
-}
-
-/** Share of the whole recipe that `eaten` units represent. */
-export function eatenFraction(r: Pick<Recipe, 'porsiyon' | 'birim' | 'birimAdet'>, eaten: number): number {
-  return Math.max(0, eaten) / unitCount(r);
+/** One portion when the whole recipe is divided into `parts` portions. */
+export function portionOf(t: Totals, parts: number): Totals {
+  return scale(t, 1 / Math.max(1, parts || 1));
 }
 
 /** Values for one standard portion of the recipe with its usual grams. */

@@ -14,7 +14,7 @@ export function CookMode() {
   const { id = '' } = useParams();
   const recipe = useLiveQuery(() => db.recipes.get(id), [id]);
   const lib = useLibrary();
-  const [plate] = useSessionState<PlateState>(plateKey(id), { grams: {}, eaten: 0 });
+  const [plate] = useSessionState<PlateState>(plateKey(id), { grams: {} });
   const [note, setNote] = useSessionState<string>(cookNoteKey(id), '');
   const [i, setI] = useState(0);
   const [left, setLeft] = useState<number | null>(null);

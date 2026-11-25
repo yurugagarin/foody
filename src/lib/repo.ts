@@ -184,7 +184,12 @@ export async function addAttempt(a: Omit<Attempt, 'id' | 'createdAt'>, opts: { m
       const r = await db.recipes.get(a.recipeId);
       if (r) {
         const g = a.gramlar;
-        await db.recipes.put({ ...r, malzemeler: r.malzemeler.map((m) => (m.ingId in g ? { ...m, gram: g[m.ingId] } : m)), updatedAt: now });
+        await db.recipes.put({
+          ...r,
+          porsiyon: a.bolum ?? r.porsiyon,
+          malzemeler: r.malzemeler.map((m) => (m.ingId in g ? { ...m, gram: g[m.ingId] } : m)),
+          updatedAt: now
+        });
       }
     }
   });

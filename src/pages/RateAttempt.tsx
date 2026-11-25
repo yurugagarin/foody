@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
 import { cookNoteKey, plateKey, useLibrary, useSessionState, type PlateState } from '../lib/hooks';
-import { defaultEaten, eatenFraction, recipeTotals, scale, unitName, parseNum } from '../lib/nutrition';
+import { portionOf, recipeTotals, parseNum } from '../lib/nutrition';
 import { stats } from '../lib/score';
 import { addAttempt } from '../lib/repo';
 import { YONTEMLER } from '../types';
@@ -23,7 +23,7 @@ export function RateAttempt() {
   const recipe = useLiveQuery(() => db.recipes.get(id), [id]);
   const attempts = useLiveQuery(() => db.attempts.where('recipeId').equals(id).toArray(), [id]);
   const lib = useLibrary();
-  const [plate, setPlate] = useSessionState<PlateState>(plateKey(id), { grams: {}, eaten: 0 });
+  const [plate, setPlate] = useSessionState<PlateState>(plateKey(id), { grams: {} });
   const [cookNote, setCookNote] = useSessionState<string>(cookNoteKey(id), '');
   const [score, setScore] = useState(8);
   const [rated, setRated] = useState(true);
@@ -42,8 +42,8 @@ export function RateAttempt() {
   const st = stats(attempts);
   const ratedList = attempts.filter((a) => a.puan != null).map((a) => a.puan as number);
   const newAvg = rated ? (ratedList.reduce((s, x) => s + x, 0) + score) / (ratedList.length + 1) : st.avg;
-  const eaten = plate.eaten || defaultEaten(recipe);
-  const t = scale(recipeTotals(recipe, lib, plate.grams), eatenFraction(recipe, eaten));
+  const parts = plate.parts || recipe.porsiyon || 1;
+  const t = portionOf(recipeTotals(recipe, lib, plate.grams), parts);
   const changes = recipe.malzemeler
     .filter((m) => m.ingId in plate.grams && plate.grams[m.ingId] !== m.gram)
     .map((m) => {
@@ -68,13 +68,14 @@ export function RateAttempt() {
         not: noteValue.trim() || undefined,
         fotoId: foto,
         gramlar,
-        yenen: eaten,
+        bolum: parts,
+        pismisGram: plate.cooked ?? null,
         enIyi: best
       },
       { makeDefault }
     );
     setCookNote('');
-    if (makeDefault) setPlate({ grams: {}, eaten });
+    if (makeDefault) setPlate({ grams: {} });
     nav(`/tarif/${recipe.id}`);
   };
 
@@ -108,7 +109,7 @@ export function RateAttempt() {
       </section>
 
       <section className="card stack">
-        <span className="lab">Bu sefer tabağın · {String(eaten).replace('.', ',')} {unitName(recipe)}</span>
+        <span className="lab">Bu sefer 1 porsiyon · {parts} porsiyona böldün</span>
         <Badges t={t} size="md" />
         <span className="small muted">{changes.length ? `Her zamankinden farkı: ${changes.join(', ')}` : 'Her zamanki gramlar.'} <Link to={`/tarif/${recipe.id}`}>Gramları değiştir</Link></span>
       </section>
@@ -144,10 +145,10 @@ export function RateAttempt() {
           <input type="checkbox" checked={best} onChange={(e) => setBest(e.target.checked)} style={{ width: 22, height: 22, accentColor: 'var(--gold)' }} />
           Bunu “en iyi versiyon” yap
         </label>
-        {changes.length > 0 && (
+        {(changes.length > 0 || parts !== recipe.porsiyon) && (
           <label className="row small" style={{ minHeight: 44, color: 'var(--soft)' }}>
             <input type="checkbox" checked={makeDefault} onChange={(e) => setMakeDefault(e.target.checked)} style={{ width: 22, height: 22, accentColor: 'var(--gold)' }} />
-            Bu gramları bir dahakine varsayılan yap
+            Bu gramları ve porsiyon sayısını bir dahakine varsayılan yap
           </label>
         )}
         <button className="btn gold" style={{ height: 60, fontSize: 17 }} disabled={saving} onClick={save}>Denemeyi kaydet</button>

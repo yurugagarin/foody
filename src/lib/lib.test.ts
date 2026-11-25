@@ -2,7 +2,7 @@ import 'fake-indexeddb/auto';
 import { describe, expect, it, beforeEach } from 'vitest';
 import seed from '../seed-data.json';
 import { parseImport, draftTotals } from './importer';
-import { recipeTotals, eatenFraction, defaultEaten, unitName, f1, scale } from './nutrition';
+import { recipeTotals, portionOf, f1 } from './nutrition';
 import { stats, weight, weightedPick, sortAttempts } from './score';
 import { matchPantry } from './pantry';
 import { applyImport, resolveIngredients, saveRecipe, addAttempt } from './repo';
@@ -61,11 +61,11 @@ describe('nutrition', () => {
     expect(recipeTotals(r, lib, { k: 250 }).kcal).toBeCloseTo(440 + 44.2);
   });
 
-  it('counts eaten pieces against the whole recipe', () => {
-    expect(unitName(r)).toBe('köfte');
-    expect(defaultEaten(r)).toBe(4);
-    expect(eatenFraction(r, 4)).toBe(0.25);
-    expect(f1(scale(recipeTotals(r, lib), eatenFraction(r, 1)).kcal)).toBe('57,8');
+  it('divides the whole recipe into the chosen number of portions', () => {
+    const whole = recipeTotals(r, lib);
+    expect(f1(portionOf(whole, 2).kcal)).toBe('462,1');
+    expect(portionOf(whole, 2).gram).toBe(252.5);
+    expect(portionOf(whole, 0).kcal).toBeCloseTo(whole.kcal);
   });
 });
 

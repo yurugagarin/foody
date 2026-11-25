@@ -7,7 +7,7 @@ Kullanıcının kişisel tarif uygulaması (React + Vite + Dexie, GitHub Pages't
 Kullanıcı tarifi Claude sohbetinde `AI_PROMPT` formatında (bkz. `src/lib/importer.ts`) JSON olarak hazırlatıp buraya yapıştırır.
 
 1. Tarifi `src/seed-data.json` içindeki `tarifler` listesinin **sonuna** ekle ve benzersiz, değişmeyecek bir `"kod"` ver (ör. `"kakaolu-yulaf"`). Mevcut tariflerin `kod`'larını asla değiştirme.
-2. Kontrol et: her malzemede gram ve `her_100g` var mı; toplam `kontrol_toplam` ile tutuyor mu (`npm test` dört tarif için bunu yapar; yenisi için hesaplayıp kullanıcıya söyle). Köfte/dilim gibi parçalıysa `birim` ve `birim_adet` ekle.
+2. Kontrol et: her malzemede gram ve `her_100g` var mı; toplam `kontrol_toplam` ile tutuyor mu (`npm test` dört tarif için bunu yapar; yenisi için hesaplayıp kullanıcıya söyle). `porsiyon` tarifin kaç porsiyonluk yapıldığıdır; uygulama "Kaç porsiyona böldün?" ile 1 porsiyonun gramını ve kalorisini verir. Köfte/dilim sayısıyla hesap yapılmaz (`birim` alanı kullanılmıyor).
 3. Malzeme adlarını kütüphanedeki mevcut adlarla aynı yaz (ör. "Zeytinyağı", "Kakao", "Whey protein tozu"), yoksa aynı malzeme iki kez kaydolur.
 4. `npm test && npm run build`, sonra commit ve `main`'e push (kullanıcı `main`'e doğrudan göndermeye izin verdi). Actions siteyi yayınlar.
 

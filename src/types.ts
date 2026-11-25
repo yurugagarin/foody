@@ -63,8 +63,10 @@ export interface Attempt {
   fotoId?: string;
   /** Grams used this time, by ingredient id (whole recipe). */
   gramlar?: Record<string, number>;
-  /** Portions (or units) eaten this time. */
-  yenen?: number;
+  /** How many portions the recipe was divided into this time. */
+  bolum?: number;
+  /** Weight of the whole dish after cooking (g), if weighed. */
+  pismisGram?: number | null;
   enIyi?: boolean;
   createdAt: number;
 }

@@ -61,14 +61,18 @@ export async function copyText(text: string): Promise<boolean> {
   }
 }
 
-/** Per-recipe "Porsiyonum" state: grams this time and how much was eaten. */
+/**
+ * Per-recipe "Porsiyonum" state: the grams put in this time (whole recipe),
+ * how many portions it was divided into, and optionally the cooked weight.
+ */
 export interface PlateState {
   grams: Record<string, number>;
-  eaten: number;
+  parts?: number;
+  cooked?: number | null;
 }
 
 export function plateKey(recipeId: string): string {
-  return `foody:plate:${recipeId}`;
+  return `foody:plate2:${recipeId}`;
 }
 export function cookNoteKey(recipeId: string): string {
   return `foody:cooknote:${recipeId}`;

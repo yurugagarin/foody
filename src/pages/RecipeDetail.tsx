@@ -2,7 +2,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
 import { useLibrary, useSessionState, plateKey, type PlateState } from '../lib/hooks';
-import { defaultEaten, eatenFraction, f1, forGrams, kcal, recipeTotals, scale, unitName } from '../lib/nutrition';
+import { f1, forGrams, kcal, parseNum, portionOf, recipeTotals, type Totals } from '../lib/nutrition';
 import { sortAttempts, stats } from '../lib/score';
 import { deleteRecipe, setBest } from '../lib/repo';
 import { deletePhoto } from '../lib/photos';
@@ -25,7 +25,7 @@ export function RecipeDetail() {
   const recipe = useLiveQuery(async () => (await db.recipes.get(id)) ?? null, [id]);
   const attempts = useLiveQuery(() => db.attempts.where('recipeId').equals(id).toArray(), [id]);
   const lib = useLibrary();
-  const [plate, setPlate] = useSessionState<PlateState>(plateKey(id), { grams: {}, eaten: 0 });
+  const [plate, setPlate] = useSessionState<PlateState>(plateKey(id), { grams: {} });
   const nav = useNavigate();
 
   if (recipe === null) {
@@ -35,13 +35,11 @@ export function RecipeDetail() {
 
   const st = stats(attempts);
   const sorted = sortAttempts(attempts);
-  const eaten = plate.eaten || defaultEaten(recipe);
+  const parts = plate.parts || recipe.porsiyon || 1;
   const whole = recipeTotals(recipe, lib, plate.grams);
   const usualWhole = recipeTotals(recipe, lib);
-  const mine = scale(whole, eatenFraction(recipe, eaten));
-  const unit = unitName(recipe);
-  const unitStep = recipe.birim && recipe.birimAdet ? 1 : 0.5;
-  const setGram = (ingId: string, g: number) => setPlate({ ...plate, eaten, grams: { ...plate.grams, [ingId]: Math.max(0, Math.round(g * 10) / 10) } });
+  const mine = portionOf(whole, parts);
+  const setGram = (ingId: string, g: number) => setPlate({ ...plate, grams: { ...plate.grams, [ingId]: Math.max(0, Math.round(g * 10) / 10) } });
   const changed = Object.entries(plate.grams).some(([k, g]) => recipe.malzemeler.find((m) => m.ingId === k)?.gram !== g);
   const diff = Math.round(whole.kcal - usualWhole.kcal);
   const cover = recipe.kapakFotoId ?? sorted.find((a) => a.fotoId)?.fotoId;
@@ -67,7 +65,7 @@ export function RecipeDetail() {
               </div>
             </div>
             <div className="over scrim" style={{ paddingTop: 80 }}>
-              <span className="lab gold">{[recipe.kategori, recipe.sureDk ? `${recipe.sureDk} dk` : null, recipe.birim && recipe.birimAdet ? `${recipe.birimAdet} ${recipe.birim}` : `${recipe.porsiyon} porsiyon`, recipe.kaynak].filter(Boolean).join(' · ')}</span>
+              <span className="lab gold">{[recipe.kategori, recipe.sureDk ? `${recipe.sureDk} dk` : null, `${recipe.porsiyon} porsiyon`, recipe.kaynak].filter(Boolean).join(' · ')}</span>
               <h1 className="sf" style={{ fontSize: 50, lineHeight: 0.95 }}>{recipe.ad}</h1>
               <div className="row">
                 <span className="sf gold" style={{ fontSize: 34, lineHeight: 1 }}>{st.avg == null ? '–' : st.avg.toFixed(1).replace('.', ',')}</span>
@@ -81,12 +79,12 @@ export function RecipeDetail() {
             </div>
           </div>
 
-          <div className="mobile-only"><Badges t={mine} label="tabağın" /></div>
+          <div className="mobile-only"><Badges t={mine} label="1 porsiyon" /></div>
 
           {recipe.etiketler.length > 0 && <div className="row wrap" style={{ gap: 6 }}>{recipe.etiketler.map((t) => <span key={t} className="tag">{t}</span>)}</div>}
 
           <div className="mobile-only">
-            <Portion recipe={recipe} lib={lib} plate={plate} eaten={eaten} unit={unit} unitStep={unitStep} setPlate={setPlate} setGram={setGram} changed={changed} diff={diff} wholeKcal={whole.kcal} wholeGram={whole.gram} />
+            <Portion recipe={recipe} lib={lib} plate={plate} parts={parts} setPlate={setPlate} setGram={setGram} changed={changed} diff={diff} whole={whole} mine={mine} />
           </div>
 
           <section className="stack" style={{ gap: 14 }}>
@@ -103,7 +101,7 @@ export function RecipeDetail() {
             <div className="between"><h2 className="h2">Denemeler</h2><span className="small muted">en yeni üstte</span></div>
             {sorted.length === 0 && <p className="dashed muted small" style={{ margin: 0 }}>Henüz kayıt yok. Pişirince puanla, notlarını yaz.</p>}
             {sorted.map((a) => (
-              <AttemptCard key={a.id} a={a} recipe={recipe} lib={lib} onUse={a.gramlar ? () => setPlate({ ...plate, eaten: a.yenen || eaten, grams: { ...a.gramlar } }) : undefined} />
+              <AttemptCard key={a.id} a={a} recipe={recipe} lib={lib} onUse={a.gramlar ? () => setPlate({ ...plate, parts: a.bolum || parts, grams: { ...a.gramlar } }) : undefined} />
             ))}
           </section>
 
@@ -125,8 +123,8 @@ export function RecipeDetail() {
         </div>
 
         <div className="aside desktop-only stack" style={{ gap: 20, paddingTop: 28 }}>
-          <Badges t={mine} label="tabağın" />
-          <Portion recipe={recipe} lib={lib} plate={plate} eaten={eaten} unit={unit} unitStep={unitStep} setPlate={setPlate} setGram={setGram} changed={changed} diff={diff} wholeKcal={whole.kcal} wholeGram={whole.gram} />
+          <Badges t={mine} label="1 porsiyon" />
+          <Portion recipe={recipe} lib={lib} plate={plate} parts={parts} setPlate={setPlate} setGram={setGram} changed={changed} diff={diff} whole={whole} mine={mine} />
         </div>
       </div>
     </div>
@@ -154,27 +152,26 @@ interface PortionProps {
   recipe: Recipe;
   lib: Map<string, Ingredient>;
   plate: PlateState;
-  eaten: number;
-  unit: string;
-  unitStep: number;
+  parts: number;
   setPlate: (p: PlateState) => void;
   setGram: (ingId: string, g: number) => void;
   changed: boolean;
   diff: number;
-  wholeKcal: number;
-  wholeGram: number;
+  whole: Totals;
+  mine: Totals;
 }
 
-function Portion({ recipe, lib, plate, eaten, unit, unitStep, setPlate, setGram, changed, diff, wholeKcal, wholeGram }: PortionProps) {
-  const multi = recipe.porsiyon > 1 || !!recipe.birimAdet;
+function Portion({ recipe, lib, plate, parts, setPlate, setGram, changed, diff, whole, mine }: PortionProps) {
+  const cooked = plate.cooked && plate.cooked > 0 ? plate.cooked : null;
+  const portionGram = (cooked ?? whole.gram) / parts;
   return (
     <section className="card stack" style={{ gap: 4 }}>
       <div className="between" style={{ marginBottom: 4 }}>
         <div className="stack" style={{ gap: 2 }}>
           <h2 className="h2">Porsiyonum</h2>
-          <span className="small muted">bu sefer kaç gram koydun?{multi ? ' (bütün tarif için)' : ''}</span>
+          <span className="small muted">bu sefer hangisinden kaç gram koydun?</span>
         </div>
-        <button className="btn sm" disabled={!changed} onClick={() => setPlate({ grams: {}, eaten })}>Her zamanki</button>
+        <button className="btn sm" disabled={!changed && parts === recipe.porsiyon && !cooked} onClick={() => setPlate({ grams: {} })}>Her zamanki</button>
       </div>
       {recipe.malzemeler.map((m) => {
         const ing = lib.get(m.ingId);
@@ -212,25 +209,51 @@ function Portion({ recipe, lib, plate, eaten, unit, unitStep, setPlate, setGram,
         );
       })}
       <div className="between small" style={{ paddingTop: 10, color: 'var(--soft)' }}>
-        <span>Bütün tarif {Math.round(wholeGram)} g{diff ? ` · her zamankinden ${diff > 0 ? '+' : ''}${diff} kcal` : ''}</span>
-        <span className="pill" style={{ fontSize: 14 }}>{kcal(wholeKcal)} kcal</span>
+        <span>Bütün tarif {Math.round(whole.gram)} g{diff ? ` · her zamankinden ${diff > 0 ? '+' : ''}${diff} kcal` : ''}</span>
+        <span className="pill" style={{ fontSize: 14 }}>{kcal(whole.kcal)} kcal</span>
       </div>
-      {multi && (
-        <div className="between" style={{ paddingTop: 12, marginTop: 6, borderTop: '1px solid var(--line)' }}>
-          <span>Yediğim</span>
-          <div className="row" style={{ gap: 8 }}>
-            <button className="stp" aria-label="Azalt" onClick={() => setPlate({ ...plate, eaten: Math.max(unitStep, eaten - unitStep) })}>−</button>
-            <span className="sf" style={{ fontSize: 24, minWidth: 90, textAlign: 'center' }}>{String(eaten).replace('.', ',')} {unit}</span>
-            <button className="stp" aria-label="Artır" onClick={() => setPlate({ ...plate, eaten: eaten + unitStep })}>+</button>
-          </div>
+
+      <div className="between" style={{ paddingTop: 14, marginTop: 8, borderTop: '1px solid var(--line)' }}>
+        <span>Kaç porsiyona böldün?</span>
+        <div className="row" style={{ gap: 8 }}>
+          <button className="stp" aria-label="Porsiyon sayısını azalt" disabled={parts <= 1} onClick={() => setPlate({ ...plate, parts: Math.max(1, parts - 1) })}>−</button>
+          <span className="sf" style={{ fontSize: 28, minWidth: 36, textAlign: 'center' }}>{parts}</span>
+          <button className="stp" aria-label="Porsiyon sayısını artır" onClick={() => setPlate({ ...plate, parts: parts + 1 })}>+</button>
         </div>
-      )}
+      </div>
+      <div className="between" style={{ paddingTop: 8 }}>
+        <label htmlFor="pismis" className="stack" style={{ gap: 2 }}>
+          <span>Pişince bütün yemek kaç gram?</span>
+          <span className="small muted">İstersen tart; porsiyon gramı daha doğru çıkar.</span>
+        </label>
+        <input
+          id="pismis"
+          className="gram-in"
+          style={{ width: 84 }}
+          inputMode="numeric"
+          placeholder="—"
+          value={cooked ?? ''}
+          onChange={(e) => {
+            const v = parseNum(e.target.value);
+            setPlate({ ...plate, cooked: Number.isFinite(v) && v > 0 ? v : null });
+          }}
+        />
+      </div>
+
+      <div style={{ marginTop: 12, padding: 14, borderRadius: 18, border: '1px solid var(--gold)', display: 'flex', alignItems: 'center', gap: 14 }}>
+        <span className="rb kcal" style={{ width: 84, height: 84 }}><b style={{ fontSize: 26 }}>{kcal(mine.kcal)}</b><small>KCAL</small></span>
+        <div className="stack" style={{ gap: 4 }}>
+          <span className="lab gold">1 porsiyon{parts > 1 ? ` · ${parts}'de 1` : ''}</span>
+          <span className="sf" style={{ fontSize: 30, lineHeight: 1 }}>{Math.round(portionGram)} g</span>
+          <span className="small muted">{cooked ? 'pişmiş ağırlık' : 'malzemelerin çiğ ağırlığı'} · P {f1(mine.protein)} · K {f1(mine.karb)} · Y {f1(mine.yag)}</span>
+        </div>
+      </div>
     </section>
   );
 }
 
 function AttemptCard({ a, recipe, lib, onUse }: { a: Attempt; recipe: Recipe; lib: Map<string, Ingredient>; onUse?: () => void }) {
-  const t = a.gramlar ? scale(recipeTotals(recipe, lib, a.gramlar), eatenFraction(recipe, a.yenen || defaultEaten(recipe))) : null;
+  const t = a.gramlar ? portionOf(recipeTotals(recipe, lib, a.gramlar), a.bolum || recipe.porsiyon) : null;
   const meta = [a.yontem, a.derece ? `${a.derece} °C` : null, a.sureDk ? `${a.sureDk} dk` : null].filter(Boolean).join(' · ');
   return (
     <div className={`attempt${a.enIyi ? ' best' : ''}`}>
@@ -243,7 +266,7 @@ function AttemptCard({ a, recipe, lib, onUse }: { a: Attempt; recipe: Recipe; li
         {(meta || t) && (
           <span className="row wrap small muted" style={{ gap: 6 }}>
             {meta}
-            {t && <span className="pill">{kcal(t.kcal)} kcal</span>}
+            {t && <span className="pill">porsiyon {kcal(t.kcal)} kcal</span>}
           </span>
         )}
         {a.not && <span className="sf it" style={{ fontSize: 18, lineHeight: 1.28 }}>“{a.not}”</span>}
