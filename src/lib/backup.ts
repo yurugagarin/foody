@@ -16,15 +16,16 @@ async function dataUrlToBlob(u: string): Promise<Blob> {
 
 /** One file with everything, photos included: for moving between phone and computer. */
 export async function exportAll(): Promise<Blob> {
-  const [ingredients, recipes, attempts, photos] = await Promise.all([
+  const [ingredients, recipes, attempts, photos, seedKeys] = await Promise.all([
     db.ingredients.toArray(),
     db.recipes.toArray(),
     db.attempts.toArray(),
-    db.photos.toArray()
+    db.photos.toArray(),
+    db.meta.get('seedKeys')
   ]);
   const ph = [];
   for (const p of photos) ph.push({ id: p.id, createdAt: p.createdAt, blob: await blobToDataUrl(p.blob), thumb: await blobToDataUrl(p.thumb) });
-  const data = { app: 'foody', version: 1, exportedAt: new Date().toISOString(), ingredients, recipes, attempts, photos: ph };
+  const data = { app: 'foody', version: 1, exportedAt: new Date().toISOString(), ingredients, recipes, attempts, photos: ph, seedKeys: seedKeys?.value ?? [] };
   return new Blob([JSON.stringify(data)], { type: 'application/json' });
 }
 
@@ -40,7 +41,7 @@ export async function importAll(file: File): Promise<{ recipes: number }> {
     await db.recipes.bulkPut(data.recipes ?? []);
     await db.attempts.bulkPut(data.attempts ?? []);
     await db.photos.bulkPut(photos);
-    await db.meta.put({ key: 'seeded', value: Date.now() });
+    await db.meta.put({ key: 'seedKeys', value: data.seedKeys ?? [] });
   });
   return { recipes: (data.recipes ?? []).length };
 }

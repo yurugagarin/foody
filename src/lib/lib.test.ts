@@ -7,6 +7,7 @@ import { stats, weight, weightedPick, sortAttempts } from './score';
 import { matchPantry } from './pantry';
 import { applyImport, resolveIngredients, saveRecipe, addAttempt } from './repo';
 import { db } from '../db';
+import { syncSeed } from './seed';
 import type { Ingredient } from '../types';
 
 describe('importer', () => {
@@ -145,5 +146,27 @@ describe('repo', () => {
     const ingId = r.malzemeler[0].ingId;
     await addAttempt({ recipeId: id, tarih: '2026-11-25', puan: 9, gramlar: { [ingId]: 80 } }, { makeDefault: true });
     expect((await db.recipes.get(id))!.malzemeler[0].gram).toBe(80);
+  });
+});
+
+describe('seed sync', () => {
+  beforeEach(async () => {
+    await Promise.all(db.tables.map((t) => t.clear()));
+  });
+
+  it('adds only recipes the device has not received, and never brings back a deleted one', async () => {
+    expect(await syncSeed()).toBe(4);
+    expect(await syncSeed()).toBe(0);
+    const kofte = (await db.recipes.toArray()).find((r) => r.ad.startsWith('Lokanta'))!;
+    await db.recipes.delete(kofte.id);
+    const more = { tarifler: [...seed.tarifler, { kod: 'yeni-tarif', ad: 'Kakaolu Yulaf', malzemeler: [{ ad: 'Kakao', gram: 10, her_100g: { kcal: 300, protein: 1, karb: 1, yag: 1 } }] }] };
+    expect(await syncSeed(more)).toBe(1);
+    const names = (await db.recipes.toArray()).map((r) => r.ad);
+    expect(names).toContain('Kakaolu Yulaf');
+    expect(names.some((n) => n.startsWith('Lokanta'))).toBe(false);
+    // The library keeps the existing cocoa values.
+    const kakao = (await db.ingredients.toArray()).filter((i) => i.ad === 'Kakao');
+    expect(kakao.length).toBe(1);
+    expect(kakao[0].kcal).toBe(366);
   });
 });

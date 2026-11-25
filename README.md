@@ -22,7 +22,11 @@ Telefonda: siteyi aç → iPhone'da Paylaş → “Ana Ekrana Ekle”, Android'd
 
 ## Tarif formatı
 
-Yapay zekâya verilecek kalıp uygulamada var (Ayarlar → Yapay zekâ kalıbı). İlk dört tarif `src/seed-data.json` dosyasında; uygulama ilk açıldığında bunları yükler.
+Yapay zekâya verilecek kalıp uygulamada var (Ayarlar → Yapay zekâ kalıbı).
+
+Tarifler iki yoldan eklenir:
+- **Uygulamadan:** Yeni tarif → Yapay zekâdan yapıştır.
+- **Repodan:** `src/seed-data.json`'a eklenen her tarif, uygulama bir sonraki açılışında bütün cihazlara bir kez gelir. Silinen tarif geri gelmez; gramlar, puanlar ve fotoğraflar cihazda kalır.
 
 ## Geliştirme
 

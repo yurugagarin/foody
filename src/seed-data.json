@@ -1,6 +1,7 @@
 {
   "tarifler": [
     {
+      "kod": "protein-brownie",
       "ad": "Protein Brownie (Islak Kek)",
       "kategori": "Tatlı",
       "porsiyon": 1,
@@ -36,6 +37,7 @@
       "kontrol_toplam": { "kcal": 854.4, "protein": 61.6, "karb": 34.4, "yag": 47.7 }
     },
     {
+      "kod": "lokanta-kofte",
       "ad": "Lokanta Usulü Yumuşak Köfte",
       "kategori": "Ana yemek",
       "porsiyon": 4,
@@ -76,6 +78,7 @@
       "kontrol_toplam": { "kcal": 1030.5, "protein": 103.3, "karb": 20.8, "yag": 56.1 }
     },
     {
+      "kod": "somonlu-makarna-kremasiz",
       "ad": "Somonlu Makarna (Kremasız)",
       "kategori": "Ana yemek",
       "porsiyon": 1,
@@ -109,6 +112,7 @@
       "kontrol_toplam": { "kcal": 909.8, "protein": 63.5, "karb": 65.5, "yag": 40.3 }
     },
     {
+      "kod": "yogurt-cheesecake",
       "ad": "Kolay Yoğurt Cheesecake",
       "kategori": "Tatlı",
       "porsiyon": 6,
